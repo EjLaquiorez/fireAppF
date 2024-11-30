@@ -26,10 +26,45 @@ class Incident(BaseModel):
         ('Moderate Fire', 'Moderate Fire'),
         ('Major Fire', 'Major Fire'),
     )
-    location = models.ForeignKey(Locations, on_delete=models.CASCADE)
-    date_time = models.DateTimeField(blank=True, null=True)
-    severity_level = models.CharField(max_length=45, choices=SEVERITY_CHOICES)
-    description = models.CharField(max_length=250)
+    STATUS_CHOICES = (
+        ('Active', 'Active'),
+        ('Contained', 'Contained'),
+        ('Extinguished', 'Extinguished'),
+    )
+    INCIDENT_TYPE_CHOICES = (
+        ('Structure Fire', 'Structure Fire'),
+        ('Vehicle Fire', 'Vehicle Fire'),
+        ('Wildfire', 'Wildfire'),
+        ('Chemical Fire', 'Chemical Fire'),
+        ('Electrical Fire', 'Electrical Fire'),
+    )
+    location = models.ForeignKey(Locations, on_delete=models.CASCADE, related_name='incidents')
+    date_time = models.DateTimeField(
+        blank=True, 
+        null=True, 
+        help_text="Date and time when the incident occurred"
+    )
+    severity_level = models.CharField(
+        max_length=45, 
+        choices=SEVERITY_CHOICES,
+        help_text="Level of fire severity"
+    )
+    status = models.CharField(
+        max_length=45, 
+        choices=STATUS_CHOICES, 
+        default='Active'
+    )
+    description = models.TextField(  # Changed from CharField to TextField
+        max_length=1000,  # Increased max length
+        help_text="Detailed description of the incident"
+    )
+    incident_type = models.CharField(
+        max_length=100,  # Changed from 45 to 100
+        choices=INCIDENT_TYPE_CHOICES,
+        null=True,      # Added
+        blank=True,     # Added
+        help_text="Type of fire incident"
+    )
 
 
 class FireStation(BaseModel):
@@ -54,9 +89,17 @@ class Firefighters(BaseModel):
         ('Battalion Chief', 'Battalion Chief'),)
     name = models.CharField(max_length=150)
     rank = models.CharField(max_length=150)
-    experience_level = models.CharField(max_length=150)
-    station = models.CharField(
-        max_length=45, null=True, blank=True, choices=XP_CHOICES)
+    experience_level = models.CharField(
+        max_length=45,  # Reduced from 150 since we have choices
+        choices=XP_CHOICES,
+        help_text="Firefighter's experience level"
+    )
+    station = models.ForeignKey(  # Changed to ForeignKey
+        FireStation,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='firefighters'
+    )
 
 
 class FireTruck(BaseModel):
@@ -72,3 +115,4 @@ class WeatherConditions(BaseModel):
     humidity = models.DecimalField(max_digits=10, decimal_places=2)
     wind_speed = models.DecimalField(max_digits=10, decimal_places=2)
     weather_description = models.CharField(max_length=150)
+    wind_direction = models.CharField(max_length=50, null=True, blank=True)  # Add this

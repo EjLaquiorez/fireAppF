@@ -26,5 +26,6 @@ urlpatterns = [
     path('incident/<int:pk>/edit/', IncidentUpdateView.as_view(), name='incident-update'),
     path('incident/<int:pk>/delete/', IncidentDeleteView.as_view(), name='incident-delete'),
     path('stations/', views.map_station, name='map-station'),
+    path('incidents/', views.map_incident, name='map-incident'),
     
 ]

@@ -238,3 +238,69 @@ def delete_incident(request, pk):
         messages.success(request, 'Incident was successfully deleted.')
         return redirect('incident-list')
     return render(request, 'delete_incident.html', {'incident': incident})
+
+def map_incident(request):
+    # Get incidents with their locations, weather conditions, and additional fields
+    incidents = Incident.objects.filter(
+        location__latitude__isnull=False,
+        location__longitude__isnull=False
+    ).select_related('location').prefetch_related('weatherconditions_set').values(
+        'severity_level',
+        'date_time',
+        'location__name',
+        'location__latitude',
+        'location__longitude',
+        'status',
+        'incident_type',
+        'description',
+        'weatherconditions__temperature',
+        'weatherconditions__humidity',
+        'weatherconditions__wind_speed',
+        
+    )
+
+    # Get fire stations
+    fire_stations = FireStation.objects.values('name', 'latitude', 'longitude')
+
+    # Get unique locations for the filter dropdown
+    locations = Incident.objects.values_list('location__name', flat=True).distinct()
+
+    # Format the data for the template
+    incident_list = []
+    for incident in incidents:
+        try:
+            latitude = float(incident['location__latitude'])
+            longitude = float(incident['location__longitude'])
+        except (ValueError, TypeError):
+            continue
+            
+        incident_list.append({
+            'latitude': latitude,
+            'longitude': longitude,
+            'severity_level': incident['severity_level'],
+            'date': incident['date_time'].strftime('%Y-%m-%d %H:%M'),
+            'location': incident['location__name'],
+            'status': 'Active' if incident.get('status') == 'active' else 'Resolved',
+            'incident_type': incident.get('incident_type', 'Fire Incident'),
+            'description': incident.get('description', ''),
+            'weather': {
+                'temperature': incident.get('weatherconditions__temperature'),
+                'humidity': incident.get('weatherconditions__humidity'),
+                'wind_speed': incident.get('weatherconditions__wind_speed'),
+                'wind_direction': incident.get('weatherconditions__wind_direction')
+            }
+        })
+
+    # Format fire stations data
+    station_list = [{
+        'name': station['name'],
+        'latitude': float(station['latitude']),
+        'longitude': float(station['longitude'])
+    } for station in fire_stations]
+
+    context = {
+        'fireIncidents': incident_list,
+        'fireStations': station_list,
+        'locations': locations,
+    }
+    return render(request, 'map_incident.html', context)

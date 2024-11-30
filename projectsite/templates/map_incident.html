@@ -1,0 +1,382 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+
+<div class="page-inner">
+  <div class="page-header">
+    <h4 class="page-title">Fire Incidents Map</h4>
+    <ul class="breadcrumbs">
+      <li class="nav-home">
+        <a href="#">
+          <i class="flaticon-home"></i>
+        </a>
+      </li>
+      <li class="separator">
+        <i class="flaticon-right-arrow"></i>
+      </li>
+      <li class="nav-item">
+        <a href="#">Maps</a>
+      </li>
+      <li class="separator">
+        <i class="flaticon-right-arrow"></i>
+      </li>
+      <li class="nav-item">
+        <a href="#">Incidents</a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header">
+          <div class="d-flex align-items-center">
+            <h4 class="card-title">Fire Incidents Overview</h4>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="locationFilter">Filter by Location</label>
+                <select id="locationFilter" class="form-control">
+                  <option value="all">All Locations</option>
+                  {% for location in locations %}
+                    <option value="{{ location }}">{{ location }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="statusFilter">Filter by Status</label>
+                <select id="statusFilter" class="form-control">
+                  <option value="all">All Status</option>
+                  <option value="active">Active</option>
+                  <option value="resolved">Resolved</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <label for="severityFilter">Filter by Severity</label>
+                <select id="severityFilter" class="form-control">
+                  <option value="all">All Severity Levels</option>
+                  <option value="Minor Fire">Minor Fire</option>
+                  <option value="Moderate Fire">Moderate Fire</option>
+                  <option value="Major Fire">Major Fire</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>Date Range</label>
+                <div class="input-group">
+                  <input type="date" id="dateFrom" class="form-control">
+                  <div class="input-group-append">
+                    <span class="input-group-text">to</span>
+                  </div>
+                  <input type="date" id="dateTo" class="form-control">
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label>Weather Conditions</label>
+                <div class="row">
+                  <div class="col-md-4">
+                    <input type="number" id="tempFilter" class="form-control" placeholder="Temp (°C)" min="0">
+                  </div>
+                  <div class="col-md-4">
+                    <input type="number" id="humidityFilter" class="form-control" placeholder="Humidity (%)" min="0" max="100">
+                  </div>
+                  <div class="col-md-4">
+                    <input type="number" id="windFilter" class="form-control" placeholder="Wind (km/h)" min="0">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div id="map" style="width: 100%; height: 600px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css">
+
+<script>
+  // Initialize the map
+  var map = L.map('map').setView([9.81644, 118.72239], 13);
+
+  // Add the OpenStreetMap tiles
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map);
+
+  // Custom fire icon
+  var fireIcon = L.icon({
+    iconUrl: "{% static 'img/fire-icon.png' %}",
+    iconSize: [32, 32],
+    iconAnchor: [16, 32],
+    popupAnchor: [0, -32]
+  });
+
+  var markers = [];
+  var incidents = JSON.parse('{{ fireIncidents|default:"[]"|escapejs|safe }}');
+
+  // Create a marker cluster group
+  var markerCluster = L.markerClusterGroup();
+  map.addLayer(markerCluster);
+
+  // Custom icons for different severity levels
+  var icons = {
+    'Minor Fire': L.icon({
+      iconUrl: "{% static 'img/fire-icon-minor.png' %}",
+      iconSize: [24, 24],
+      iconAnchor: [12, 24],
+      popupAnchor: [0, -24]
+    }),
+    'Moderate Fire': L.icon({
+      iconUrl: "{% static 'img/fire-icon-moderate.png' %}",
+      iconSize: [28, 28],
+      iconAnchor: [14, 28],
+      popupAnchor: [0, -28]
+    }),
+    'Major Fire': L.icon({
+      iconUrl: "{% static 'img/fire-icon-major.png' %}",
+      iconSize: [32, 32],
+      iconAnchor: [16, 32],
+      popupAnchor: [0, -32]
+    })
+  };
+
+  function createMarkers(filterLocation = 'all', filterStatus = 'all', filterSeverity = 'all', dateFrom = null, dateTo = null) {
+    markerCluster.clearLayers();
+    markers = [];
+
+    incidents.forEach(function(incident) {
+      if (incident && incident.latitude && incident.longitude) {
+        // Apply weather filters
+        const temp = parseFloat(document.getElementById('tempFilter').value);
+        const humidity = parseFloat(document.getElementById('humidityFilter').value);
+        const wind = parseFloat(document.getElementById('windFilter').value);
+
+        if (
+          (isNaN(temp) || incident.temperature <= temp) &&
+          (isNaN(humidity) || incident.humidity <= humidity) &&
+          (isNaN(wind) || incident.wind_speed <= wind)
+        ) {
+          // Apply all filters
+          if ((filterLocation === 'all' || incident.location === filterLocation) && 
+              (filterStatus === 'all' || incident.status.toLowerCase() === filterStatus) &&
+              (filterSeverity === 'all' || incident.severity_level === filterSeverity)) {
+            
+            // Apply date filter if dates are selected
+            var incidentDate = new Date(incident.date);
+            if (dateFrom && dateTo) {
+              let from = new Date(dateFrom);
+              let to = new Date(dateTo);
+              if (incidentDate < from || incidentDate > to) return;
+            }
+
+            var latitude = parseFloat(incident.latitude);
+            var longitude = parseFloat(incident.longitude);
+
+            if (!isNaN(latitude) && !isNaN(longitude)) {
+              var marker = L.marker([latitude, longitude], { 
+                icon: icons[incident.severity_level] || fireIcon 
+              });
+
+              // Format date if it exists
+              var date = incident.date ? new Date(incident.date).toLocaleDateString() : 'N/A';
+
+              // Create detailed popup content
+              var popupContent = `
+                <div class="incident-popup">
+                  <h5>${incident.incident_type || 'Fire Incident'}</h5>
+                  <p><strong>Date:</strong> ${date}</p>
+                  <p><strong>Location:</strong> ${incident.location || 'N/A'}</p>
+                  <p><strong>Status:</strong> <span class="badge ${incident.status === 'Active' ? 'badge-danger' : 'badge-success'}">${incident.status || 'N/A'}</span></p>
+                  <p><strong>Description:</strong> ${incident.description || 'No description available'}</p>
+                </div>
+              `;
+
+              marker.bindPopup(popupContent);
+
+              // Add hover effects
+              marker.on('mouseover', function(e) {
+                this.openPopup();
+              });
+
+              marker.on('mouseout', function(e) {
+                this.closePopup();
+              });
+
+              // Add marker to cluster instead of directly to map
+              markerCluster.addLayer(marker);
+              markers.push(marker);
+            }
+          }
+        }
+      }
+    });
+
+    // Adjust map view if there are markers
+    if (markers.length > 0) {
+      map.fitBounds(markerCluster.getBounds().pad(0.1));
+    }
+  }
+
+  // Initialize markers
+  createMarkers();
+
+  // Add event listeners for new filters
+  document.getElementById('severityFilter').addEventListener('change', updateFilters);
+  document.getElementById('dateFrom').addEventListener('change', updateFilters);
+  document.getElementById('dateTo').addEventListener('change', updateFilters);
+  document.getElementById('tempFilter').addEventListener('change', updateFilters);
+  document.getElementById('humidityFilter').addEventListener('change', updateFilters);
+  document.getElementById('windFilter').addEventListener('change', updateFilters);
+  document.getElementById('locationFilter').addEventListener('change', updateFilters);
+  document.getElementById('statusFilter').addEventListener('change', updateFilters);
+
+  function updateFilters() {
+    var location = document.getElementById('locationFilter').value;
+    var status = document.getElementById('statusFilter').value;
+    var severity = document.getElementById('severityFilter').value;
+    var dateFrom = document.getElementById('dateFrom').value;
+    var dateTo = document.getElementById('dateTo').value;
+
+    // Validate dates
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Set to start of day for fair comparison
+    
+    const fromDate = dateFrom ? new Date(dateFrom) : null;
+    const toDate = dateTo ? new Date(dateTo) : null;
+
+    // Check for future dates
+    if (fromDate && fromDate > today) {
+        alert('Start date cannot be in the future');
+        document.getElementById('dateFrom').value = '';
+        return;
+    }
+    if (toDate && toDate > today) {
+        alert('End date cannot be in the future');
+        document.getElementById('dateTo').value = '';
+        return;
+    }
+
+    // Check if end date is before start date
+    if (fromDate && toDate && toDate < fromDate) {
+        alert('End date cannot be before start date');
+        document.getElementById('dateTo').value = '';
+        return;
+    }
+
+    // Validate weather inputs
+    const temp = document.getElementById('tempFilter').value;
+    const humidity = document.getElementById('humidityFilter').value;
+    const wind = document.getElementById('windFilter').value;
+
+    if (temp && temp < 0) {
+      alert('Temperature cannot be negative');
+      document.getElementById('tempFilter').value = '';
+      return;
+    }
+    if (humidity && (humidity < 0 || humidity > 100)) {
+      alert('Humidity must be between 0 and 100');
+      document.getElementById('humidityFilter').value = '';
+      return;
+    }
+    if (wind && wind < 0) {
+      alert('Wind speed cannot be negative');
+      document.getElementById('windFilter').value = '';
+      return;
+    }
+
+    createMarkers(location, status, severity, dateFrom, dateTo);
+  }
+
+  // Add max date restriction to date inputs
+  document.addEventListener('DOMContentLoaded', function() {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('dateFrom').max = today;
+    document.getElementById('dateTo').max = today;
+  });
+
+  // Add legend to map
+  var legend = L.control({position: 'bottomright'});
+  legend.onAdd = function(map) {
+    var div = L.DomUtil.create('div', 'legend');
+    div.innerHTML = `
+      <h6>Severity Levels</h6>
+      <div><img src="{% static 'img/fire-icon-minor.png' %}"> Minor Fire</div>
+      <div><img src="{% static 'img/fire-icon-moderate.png' %}"> Moderate Fire</div>
+      <div><img src="{% static 'img/fire-icon-major.png' %}"> Major Fire</div>
+    `;
+    return div;
+  };
+  legend.addTo(map);
+</script>
+
+<style>
+  .incident-popup {
+    min-width: 200px;
+  }
+  .incident-popup h5 {
+    margin-bottom: 10px;
+    color: #1a2035;
+  }
+  .incident-popup p {
+    margin-bottom: 5px;
+  }
+  .badge-danger {
+    background-color: #f25961;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 3px;
+  }
+  .badge-success {
+    background-color: #31ce36;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 3px;
+  }
+  .legend {
+    background: white;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+  }
+  .legend h6 {
+    margin-bottom: 10px;
+    font-weight: bold;
+  }
+  .legend div {
+    margin-bottom: 5px;
+  }
+  .legend img {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+  .input-group-text {
+    background-color: #f9f9f9;
+    border: 1px solid #ebedf2;
+  }
+  .incident-popup {
+    max-height: 300px;
+    overflow-y: auto;
+  }
+</style>
+{% endblock %} 

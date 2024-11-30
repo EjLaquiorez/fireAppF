@@ -3,6 +3,11 @@
 {% block content %}
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
 
+    <!-- Add toast container at the top level -->
+    <div id="toast-container" aria-live="polite" aria-atomic="true" style="position: fixed; bottom: 20px; right: 20px; z-index: 1050">
+        <!-- Toasts will be dynamically inserted here -->
+    </div>
+
     <div class="page-inner">
         <div class="page-header">
             <h4 class="page-title">Dashboard</h4>
@@ -85,5 +90,35 @@
                 markers.push(marker);
             });
 </script>
+
+    <!-- Add message handling code after the map script -->
+    {% if messages %}
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            {% for message in messages %}
+                const toastHTML = `
+                    <div class="toast" role="alert" style="margin-bottom: 10px;" data-delay="3000">
+                        <div class="toast-header">
+                            <img src="{% static 'images/logo-mini.svg' %}" class="rounded mr-2" style="width: 25px; height: 25px;" alt="logo">
+                            <strong class="mr-auto">Notification</strong>
+                            <small>Just now</small>
+                            <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="toast-body">
+                            {{ message|escapejs }}
+                        </div>
+                    </div>`;
+                
+                document.getElementById('toast-container').insertAdjacentHTML('beforeend', toastHTML);
+                
+                const toastElement = document.getElementById('toast-container').lastElementChild;
+                const toast = new bootstrap.Toast(toastElement);
+                toast.show();
+            {% endfor %}
+        });
+    </script>
+    {% endif %}
 {% endblock %}
             
