@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404, redirect, render
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView, TemplateView
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView, TemplateView, View
 from django.urls import reverse_lazy
 from django.db import connection
 from django.http import JsonResponse
@@ -346,19 +346,6 @@ def get_weather(request):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
-def map_incident_view(request):
-    # Get all unique locations from Incident model
-    locations = Incident.objects.values_list('location__name', flat=True).distinct()
-    
-    # Get all incidents with their locations
-    incidents = Incident.objects.select_related('location').all()
-    
-    context = {
-        'locations': locations,
-        'fireIncidents': list(incidents)
-    }
-    return render(request, 'map_incident.html', context)
-
 def bar_chart(request):
     # Example query - modify according to your model structure
     monthly_data = Incident.objects.values('month').annotate(count=Count('id'))
@@ -399,8 +386,37 @@ def incident_list_table(request):
     # Render the template with the context
     return render(request, 'incident_list.html', context)
 
-class MapIncidentView(TemplateView):
-    template_name = 'fire/map_incident.html'
+class MapIncidentView(View):
+    def get(self, request):
+        try:
+            # Get all unique locations from Incident model
+            locations = Incident.objects.values_list('location__name', flat=True).distinct()
+            
+            incidents = Incident.objects.filter(
+                location__latitude__isnull=False,
+                location__longitude__isnull=False
+            ).select_related('location').prefetch_related('weatherconditions_set')
+            
+            # Format the incident data
+            incident_list = [{
+                'latitude': float(incident.location.latitude),
+                'longitude': float(incident.location.longitude),
+                'severity_level': incident.severity_level,
+                'date': incident.date_time.strftime('%Y-%m-%d %H:%M'),
+                'location': incident.location.name,
+                'status': 'Active' if incident.status == 'active' else 'Resolved',
+                'incident_type': incident.incident_type,
+                'description': incident.description
+            } for incident in incidents]
+            
+            context = {
+                'locations': locations,
+                'fireIncidents': incident_list
+            }
+            return render(request, 'map_incident.html', context)
+        except Exception as e:
+            messages.error(request, f"Error loading map data: {str(e)}")
+            return render(request, 'map_incident.html', {'error': True})
 
 class LocationListView(ListView):
     model = Locations

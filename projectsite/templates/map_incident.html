@@ -101,7 +101,7 @@
           </div>
         </div>
         <div class="card-body">
-          <div id="map" style="width: 100%; height: 600px"></div>
+          <div id="map" style="width: 100%; height: 700px; border: 1px solid #ddd; border-radius: 4px;"></div>
         </div>
       </div>
     </div>
@@ -114,12 +114,13 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css">
 
 <script>
-  // Initialize the map
-  var map = L.map('map').setView([9.81644, 118.72239], 13);
+  // Update initial map view to center on Philippines
+  var map = L.map('map').setView([12.8797, 121.7740], 6);
 
-  // Add the OpenStreetMap tiles
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  // Add a better map tile layer with terrain details
+  L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    maxZoom: 19
   }).addTo(map);
 
   // Custom fire icon
@@ -133,8 +134,14 @@
   var markers = [];
   var incidents = JSON.parse('{{ fireIncidents|default:"[]"|escapejs|safe }}');
 
-  // Create a marker cluster group
-  var markerCluster = L.markerClusterGroup();
+  // Update marker cluster options for better visualization
+  var markerCluster = L.markerClusterGroup({
+    maxClusterRadius: 50,
+    spiderfyOnMaxZoom: true,
+    showCoverageOnHover: true,
+    zoomToBoundsOnClick: true,
+    disableClusteringAtZoom: 16
+  });
   map.addLayer(markerCluster);
 
   // Custom icons for different severity levels
@@ -235,9 +242,16 @@
       }
     });
 
-    // Adjust map view if there are markers
+    // Improve bounds handling
     if (markers.length > 0) {
-      map.fitBounds(markerCluster.getBounds().pad(0.1));
+      var bounds = L.latLngBounds(markers.map(m => m.getLatLng()));
+      map.fitBounds(bounds, {
+        padding: [50, 50],
+        maxZoom: 12
+      });
+    } else {
+      // If no markers, show default Philippines view
+      map.setView([12.8797, 121.7740], 6);
     }
   }
 
@@ -382,6 +396,31 @@
   .incident-popup {
     max-height: 300px;
     overflow-y: auto;
+  }
+
+  /* Add smooth zoom animation */
+  .leaflet-fade-anim .leaflet-tile,.leaflet-zoom-anim .leaflet-zoom-animated { 
+    will-change: auto !important; 
+  }
+
+  /* Improve cluster markers appearance */
+  .marker-cluster-small {
+    background-color: rgba(181, 226, 140, 0.6);
+  }
+  .marker-cluster-small div {
+    background-color: rgba(110, 204, 57, 0.6);
+  }
+  .marker-cluster-medium {
+    background-color: rgba(241, 211, 87, 0.6);
+  }
+  .marker-cluster-medium div {
+    background-color: rgba(240, 194, 12, 0.6);
+  }
+  .marker-cluster-large {
+    background-color: rgba(253, 156, 115, 0.6);
+  }
+  .marker-cluster-large div {
+    background-color: rgba(241, 128, 23, 0.6);
   }
 </style>
 {% endblock %} 
