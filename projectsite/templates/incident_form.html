@@ -53,6 +53,11 @@
                 <div id="map" style="width: 100%; height: 400px;" class="map-container">
                   <div class="loading-spinner"></div>
                 </div>
+                <div id="coordinates-display" class="mt-2">
+                  <small class="text-muted">Coordinates: <span id="coord-display">No location selected</span></small>
+                  <br>
+                  <small class="text-muted">Address: <span id="address-display">No address available</span></small>
+                </div>
                 <input type="hidden" id="latitude" name="latitude" 
                        data-default="{{ object.location.latitude|default_if_none:'' }}"
                        value="{{ object.location.latitude|default_if_none:'' }}">
@@ -141,19 +146,56 @@
       },
       onAdd: function() {
         const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
-        const button = L.DomUtil.create('a', '', container);
-        button.innerHTML = 'Test Location';
-        button.href = '#';
-        button.style.width = 'auto';
-        button.style.padding = '0 10px';
         
-        L.DomEvent.on(button, 'click', function(e) {
+        // Test Location button
+        const testButton = L.DomUtil.create('a', '', container);
+        testButton.innerHTML = 'Test Location';
+        testButton.href = '#';
+        testButton.style.width = 'auto';
+        testButton.style.padding = '0 10px';
+        testButton.style.marginBottom = '5px';  // Add spacing between buttons
+        
+        // Set Location button
+        const setLocationButton = L.DomUtil.create('a', '', container);
+        setLocationButton.innerHTML = 'Set Location';
+        setLocationButton.href = '#';
+        setLocationButton.style.width = 'auto';
+        setLocationButton.style.padding = '0 10px';
+        
+        L.DomEvent.on(testButton, 'click', function(e) {
           L.DomEvent.preventDefault(e);
           marker.setLatLng(testLocation);
           map.setView(testLocation, 13);
           latitudeField.value = testLocation.lat;
           longitudeField.value = testLocation.lng;
+          document.getElementById('coord-display').textContent = 
+            `${testLocation.lat.toFixed(6)}, ${testLocation.lng.toFixed(6)}`;
+          getLocationDetails(testLocation.lat, testLocation.lng);
           fetchWeatherData(testLocation.lat, testLocation.lng);
+        });
+        
+        L.DomEvent.on(setLocationButton, 'click', function(e) {
+          L.DomEvent.preventDefault(e);
+          if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+              const currentLocation = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
+              };
+              marker.setLatLng(currentLocation);
+              map.setView(currentLocation, 13);
+              latitudeField.value = currentLocation.lat;
+              longitudeField.value = currentLocation.lng;
+              document.getElementById('coord-display').textContent = 
+                `${currentLocation.lat.toFixed(6)}, ${currentLocation.lng.toFixed(6)}`;
+              getLocationDetails(currentLocation.lat, currentLocation.lng);
+              fetchWeatherData(currentLocation.lat, currentLocation.lng);
+            }, function(error) {
+              alert("Error getting location: " + error.message);
+            });
+          } else {
+            alert("Geolocation is not supported by your browser");
+          }
         });
         
         return container;
@@ -197,12 +239,30 @@
       const position = e.target.getLatLng();
       latitudeField.value = position.lat.toFixed(6);
       longitudeField.value = position.lng.toFixed(6);
+      document.getElementById('coord-display').textContent = 
+        `${position.lat.toFixed(6)}, ${position.lng.toFixed(6)}`;
+      getLocationDetails(position.lat, position.lng);
       fetchWeatherData(position.lat, position.lng);
     });
 
     // Initial weather data fetch
     if (lat && lng) {
+      document.getElementById('coord-display').textContent = 
+        `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+      getLocationDetails(lat, lng);
       fetchWeatherData(lat, lng);
+    }
+
+    // Reverse Geocoding Function
+    async function getLocationDetails(lat, lng) {
+      try {
+        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+        const data = await response.json();
+        document.getElementById('address-display').textContent = data.display_name;
+      } catch (error) {
+        console.error('Reverse Geocoding Error:', error);
+        document.getElementById('address-display').textContent = 'Address lookup failed';
+      }
     }
   });
 </script>
