@@ -28,8 +28,7 @@ class Incident(BaseModel):
     )
     STATUS_CHOICES = (
         ('Active', 'Active'),
-        ('Contained', 'Contained'),
-        ('Extinguished', 'Extinguished'),
+        ('Resolve', 'Resolve'),
     )
     INCIDENT_TYPE_CHOICES = (
         ('Structure Fire', 'Structure Fire'),

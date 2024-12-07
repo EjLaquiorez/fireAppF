@@ -12,7 +12,16 @@
     <script>
       WebFont.load({
         google: { families: ["Lato:300,400,700,900"] },
-        custom: { families: ["Flaticon", "Font Awesome 5 Solid", "Font Awesome 5 Regular", "Font Awesome 5 Brands", "simple-line-icons"], urls: ["{% static 'css/fonts.min.css' %}"] },
+        custom: {
+          families: [
+            "Flaticon",
+            "Font Awesome 5 Solid",
+            "Font Awesome 5 Regular",
+            "Font Awesome 5 Brands",
+            "simple-line-icons",
+          ],
+          urls: ["{% static 'css/fonts.min.css' %}"],
+        },
         active: function () {
           sessionStorage.fonts = true;
         },
@@ -22,19 +31,23 @@
     <!-- CSS Files -->
     <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}" />
     <link rel="stylesheet" href="{% static 'css/atlantis.min.css' %}" />
-
-    <!-- CSS Just for demo purpose, don't include it in your project -->
-    <link rel="stylesheet" href="{% static 'css/demo.css' %}" />
   </head>
   <body>
     <div class="wrapper">
       <div class="main-header">
         <!-- Logo Header -->
         <div class="logo-header" data-background-color="blue">
-          <a href="index.html" class="logo">
+          <a href="{% url 'home' %}" class="logo">
             <img src="{% static 'img/logo.svg' %}" alt="navbar brand" class="navbar-brand" />
           </a>
-          <button class="navbar-toggler sidenav-toggler ml-auto" type="button" data-toggle="collapse" data-target="collapse" aria-expanded="false" aria-label="Toggle navigation">
+          <button
+            class="navbar-toggler sidenav-toggler ml-auto"
+            type="button"
+            data-toggle="collapse"
+            data-target="collapse"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
             <span class="navbar-toggler-icon">
               <i class="icon-menu"></i>
             </span>
@@ -51,15 +64,8 @@
         <!-- Navbar Header -->
         <nav class="navbar navbar-header navbar-expand-lg" data-background-color="blue2">
           <div class="container-fluid">
-            <div class="collapse" id="search-nav">
-              
-            </div>
-            <ul class="navbar-nav topbar-nav ml-md-auto align-items-center">
-              
-              
-              
-              
-            </ul>
+            <div class="collapse" id="search-nav"></div>
+            <ul class="navbar-nav topbar-nav ml-md-auto align-items-center"></ul>
           </div>
         </nav>
         <!-- End Navbar -->
@@ -86,45 +92,24 @@
                 <div class="collapse in" id="collapseExample">
                   <ul class="nav">
                     <li>
-                      <a href="#profile">
-                        <span class="link-collapse">My Profile</span>
-                      </a>
+                      <a href="#profile"><span class="link-collapse">My Profile</span></a>
                     </li>
                     <li>
-                      <a href="#edit">
-                        <span class="link-collapse">Edit Profile</span>
-                      </a>
+                      <a href="#edit"><span class="link-collapse">Edit Profile</span></a>
                     </li>
                     <li>
-                      <a href="#settings">
-                        <span class="link-collapse">Settings</span>
-                      </a>
+                      <a href="#settings"><span class="link-collapse">Settings</span></a>
                     </li>
                   </ul>
                 </div>
               </div>
             </div>
             <ul class="nav nav-primary">
-              <li class="nav-item active">
-                <a data-toggle="collapse" href="#dashboard" class="collapsed" aria-expanded="false">
+              <li class="nav-item">
+                <a href="{% url 'home' %}">
                   <i class="fas fa-home"></i>
-                  <p>Dashboard</p>
-                  <span class="caret"></span>
+                  <p>Home</p>
                 </a>
-                <div class="collapse" id="dashboard">
-                  <ul class="nav nav-collapse">
-                    <li>
-                      <a href="#">
-                        <span class="sub-item">Dashboard 1</span>
-                      </a>
-                    </li>
-                    <li>
-                      <a href="#">
-                        <span class="sub-item">Dashboard 2</span>
-                      </a>
-                    </li>
-                  </ul>
-                </div>
               </li>
               <li class="nav-section">
                 <span class="sidebar-mini-icon">
@@ -163,12 +148,28 @@
                   <ul class="nav nav-collapse">
                     <li>
                       <a href="{% url 'dashboard-chart' %}">
-                        <span class="sub-item">Chart Js</span>
+                        <span class="sub-item">Dashboard</span>
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </li>
+              <li class="nav-item">
+                <a data-toggle="collapse" href="#incidents">
+                  <i class="fas fa-fire"></i>
+                  <p>Incidents</p>
+                  <span class="caret"></span>
+                </a>
+                <div class="collapse" id="incidents">
+                  <ul class="nav nav-collapse">
+                    <li>
+                      <a href="{% url 'incident-list' %}">
+                        <span class="sub-item">View All</span>
                       </a>
                     </li>
                     <li>
-                      <a href="charts/sparkline.html">
-                        <span class="sub-item">Sparkline</span>
+                      <a href="{% url 'incident-create' %}">
+                        <span class="sub-item">Add New</span>
                       </a>
                     </li>
                   </ul>
@@ -192,8 +193,7 @@
               </div>
             {% endfor %}
           {% endif %}
-          {% block content %}
-          {% endblock %}
+          {% block content %}{% endblock %}
         </div>
       </div>
       <footer class="footer">
@@ -211,63 +211,52 @@
               </li>
             </ul>
           </nav>
-          <div class="copyright ml-auto">2018, made with <i class="fa fa-heart heart text-danger"></i> by <a href="https://www.themekita.com">ThemeKita</a></div>
+          <div class="copyright ml-auto">
+            2018, made with <i class="fa fa-heart heart text-danger"></i> by <a href="https://www.themekita.com">ThemeKita</a>
+          </div>
         </div>
       </footer>
     </div>
-    <!--   Core JS Files   -->
+
+    <!-- Core JS Files -->
     <script src="{% static 'js/core/jquery.3.2.1.min.js' %}"></script>
     <script src="{% static 'js/core/popper.min.js' %}"></script>
     <script src="{% static 'js/core/bootstrap.min.js' %}"></script>
 
-    <!-- Add toast container -->
-    <div id="toast-container" aria-live="polite" aria-atomic="true" style="position: fixed; bottom: 20px; right: 20px; z-index: 1050">
-    </div>
+    <!-- Move Chart.js before other plugins -->
+    <script src="{% static 'js/plugin/chart.js/chart.min.js' %}"></script>
 
-    <!-- Add toast initialization script -->
-    {% if messages %}
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            {% for message in messages %}
-                const toastHTML = `
-                    <div class="toast" role="alert" style="margin-bottom: 10px;" data-delay="3000">
-                        <div class="toast-header">
-                            <strong class="mr-auto">Notification</strong>
-                            <small>Just now</small>
-                            <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="toast-body">
-                            {{ message|escapejs }}
-                        </div>
-                    </div>`;
-
-                document.getElementById('toast-container').insertAdjacentHTML('beforeend', toastHTML);
-                const toastElement = document.getElementById('toast-container').lastElementChild;
-                const toast = new bootstrap.Toast(toastElement);
-                toast.show();
-            {% endfor %}
-        });
-    </script>
-    {% endif %}
-
-    <!-- jQuery UI -->
+    <!-- Additional Scripts -->
     <script src="{% static 'js/plugin/jquery-ui-1.12.1.custom/jquery-ui.min.js' %}"></script>
     <script src="{% static 'js/plugin/jquery-ui-touch-punch/jquery.ui.touch-punch.min.js' %}"></script>
     <script src="{% static 'js/plugin/jquery-scrollbar/jquery.scrollbar.min.js' %}"></script>
-    <script src="{% static 'js/plugin/chart.js/chart.min.js' %}"></script>
-    <script src="{% static 'js/plugin/jquery.sparkline/jquery.sparkline.min.js' %}"></script>
-    <script src="{% static 'js/plugin/chart-circle/circles.min.js' %}"></script>
-    <script src="{% static 'js/plugin/datatables/datatables.min.js' %}"></script>
-    <script src="{% static 'js/plugin/bootstrap-notify/bootstrap-notify.min.js' %}"></script>
-    <script src="{% static 'js/plugin/jqvmap/jquery.vmap.min.js' %}"></script>
-    <script src="{% static 'js/plugin/jqvmap/maps/jquery.vmap.world.js' %}"></script>
     <script src="{% static 'js/plugin/sweetalert/sweetalert.min.js' %}"></script>
     <script src="{% static 'js/atlantis.min.js' %}"></script>
 
-    {% block chart %}
+    <!-- Add this script block before the chart block -->
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // Set default Chart.js options
+        Chart.defaults.global.defaultFontFamily = 'Lato';
+        Chart.defaults.global.defaultFontSize = 12;
+        Chart.defaults.global.responsive = true;
+        Chart.defaults.global.maintainAspectRatio = false;
+      });
+    </script>
 
+    {% block chart %}
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // Your chart initialization code here
+        const ctx = document.getElementById('yourChartId').getContext('2d');
+        new Chart(ctx, {
+          // chart configuration
+        });
+      });
+    </script>
     {% endblock %}
   </body>
 </html>
+
+</```
+rewritten_file>

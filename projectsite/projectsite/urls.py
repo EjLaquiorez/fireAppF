@@ -7,7 +7,12 @@ from fire.views import (
     LineCountbyMonth,
     MultilineIncidentTop3Country,
     multipleBarbySeverity,
-    IncidentCreateView, IncidentUpdateView, IncidentDeleteView
+    IncidentCreateView, IncidentUpdateView, IncidentDeleteView, IncidentListView,
+    incident_detail,
+    get_weather,
+    bar_chart,
+    doughnut_chart,
+    radar_chart
 )
 
 from fire import views
@@ -27,5 +32,13 @@ urlpatterns = [
     path('incident/<int:pk>/delete/', IncidentDeleteView.as_view(), name='incident-delete'),
     path('stations/', views.map_station, name='map-station'),
     path('incidents/', views.map_incident, name='map-incident'),
-    
+    path('incidents/', IncidentListView.as_view(), name='incident-list'),
+    path('incidents/new/', IncidentCreateView.as_view(), name='incident-create'),
+    path('incidents/<int:pk>/', incident_detail, name='incident-detail'),
+    path('incidents/<int:pk>/edit/', IncidentUpdateView.as_view(), name='incident-update'),
+    path('incidents/<int:pk>/delete/', IncidentDeleteView.as_view(), name='incident-delete'),
+    path('api/weather/', get_weather, name='get-weather'),
+    path('barChart/', bar_chart, name='bar_chart'),
+    path('doughnutChart/', doughnut_chart, name='doughnut_chart'),
+    path('radarChart/', radar_chart, name='radar_chart'),
 ]

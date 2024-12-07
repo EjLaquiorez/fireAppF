@@ -170,13 +170,18 @@
         const humidity = parseFloat(document.getElementById('humidityFilter').value);
         const wind = parseFloat(document.getElementById('windFilter').value);
 
+        // Get the actual location name from coordinates using reverse geocoding
+        const locationMatch = filterLocation === 'all' || 
+                            incident.location.toLowerCase().includes(filterLocation.toLowerCase()) ||
+                            incident.address?.toLowerCase().includes(filterLocation.toLowerCase());
+
         if (
           (isNaN(temp) || incident.temperature <= temp) &&
           (isNaN(humidity) || incident.humidity <= humidity) &&
           (isNaN(wind) || incident.wind_speed <= wind)
         ) {
-          // Apply all filters
-          if ((filterLocation === 'all' || incident.location === filterLocation) && 
+          // Apply all filters using the location match
+          if (locationMatch && 
               (filterStatus === 'all' || incident.status.toLowerCase() === filterStatus) &&
               (filterSeverity === 'all' || incident.severity_level === filterSeverity)) {
             
