@@ -414,22 +414,22 @@
             labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
             datasets: [
               {
-                label: "Major Fire",
-                backgroundColor: "#f3545d",
-                borderColor: "#f3545d",
+                label: severitylevel[0],
+                backgroundColor: "#177dff",
+                borderColor: "#177dff",
                 data: incidentCount_major,
               },
               {
-                label: "Moderate Fire",
+                label: severitylevel[1], 
                 backgroundColor: "#fdaf4b",
                 borderColor: "#fdaf4b",
-                data: incidentCounts_moderate,
+                data: incidentCounts_minor,
               },
               {
-                label: "Minor Fire",
-                backgroundColor: "#1d7af3",
-                borderColor: "#1d7af3",
-                data: incidentCounts_minor,
+                label: severitylevel[2],
+                backgroundColor: "#59d05d",
+                borderColor: "#59d05d", 
+                data: incidentCounts_moderate,
               },
             ],
           },
@@ -735,7 +735,7 @@
       var myRadarChart = new Chart(radarChart, {
         type: "radar",
         data: {
-          labels: ["Electrical Fire", "Chemical Fire", "Vehicle Fire", "Structure Fire", "Forest Fire"],
+          labels: ["North Region", "South Region", "East Region", "West Region", "Central Region"],
           datasets: [
             {
               data: [20, 10, 30, 25, 15],
@@ -744,7 +744,7 @@
               pointBackgroundColor: "#1d7af3",
               pointHoverRadius: 4,
               pointRadius: 3,
-              label: "Current Month",
+              label: "Major Incidents",
             },
             {
               data: [15, 25, 20, 30, 22],
@@ -753,7 +753,7 @@
               pointBackgroundColor: "#716aca",
               pointHoverRadius: 4,
               pointRadius: 3,
-              label: "Previous Month",
+              label: "Minor Incidents",
             },
           ],
         },
@@ -944,64 +944,40 @@
       //   },
       // });
       // Chart with HTML Legends
-      var gradientStroke = htmlLegendsChart.createLinearGradient(500, 0, 100, 0);
-      gradientStroke.addColorStop(0, "#177dff");
-      gradientStroke.addColorStop(1, "#80b6f4");
-
-      var gradientFill = htmlLegendsChart.createLinearGradient(500, 0, 100, 0);
-      gradientFill.addColorStop(0, "rgba(23, 125, 255, 0.7)");
-      gradientFill.addColorStop(1, "rgba(128, 182, 244, 0.3)");
-
-      var gradientStroke2 = htmlLegendsChart.createLinearGradient(500, 0, 100, 0);
-      gradientStroke2.addColorStop(0, "#f3545d");
-      gradientStroke2.addColorStop(1, "#ff8990");
-
-      var gradientFill2 = htmlLegendsChart.createLinearGradient(500, 0, 100, 0);
-      gradientFill2.addColorStop(0, "rgba(243, 84, 93, 0.7)");
-      gradientFill2.addColorStop(1, "rgba(255, 137, 144, 0.3)");
-
-      var gradientStroke3 = htmlLegendsChart.createLinearGradient(500, 0, 100, 0);
-      gradientStroke3.addColorStop(0, "#fdaf4b");
-      gradientStroke3.addColorStop(1, "#ffc478");
-      
-      var gradientFill3 = htmlLegendsChart.createLinearGradient(500, 0, 100, 0);
-      gradientFill3.addColorStop(0, "rgba(253, 175, 75, 0.7)");
-      gradientFill3.addColorStop(1, "rgba(255, 196, 120, 0.3)");
-      
       var myHtmlLegendsChart = new Chart(htmlLegendsChart, {
         type: "line",
         data: {
           labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov","Dec"],
           datasets: [
             {
-              label: "Major Incidents",
-              borderColor: gradientStroke2,
-              pointBackgroundColor: gradientStroke2,
+              label: "Major Fire",
+              borderColor: "#f3545d",
+              pointBackgroundColor: "#f3545d",
               pointRadius: 0,
-              backgroundColor: gradientFill2,
+              backgroundColor: "rgba(243, 84, 93, 0.7)",
               legendColor: "#f3545d",
               fill: true,
               borderWidth: 1,
               data: [154, 184, 175, 203, 210, 231, 240, 278, 252, 312, 320, 374],
             },
             {
-              label: "Minor Incidents",
-              borderColor: gradientStroke3,
-              pointBackgroundColor: gradientStroke3,
+              label: "Moderate Fire",
+              borderColor: "#fdaf4b",
+              pointBackgroundColor: "#fdaf4b",
               pointRadius: 0,
-              backgroundColor: gradientFill3,
+              backgroundColor: "rgba(253, 175, 75, 0.7)",
               legendColor: "#fdaf4b",
               fill: true,
               borderWidth: 1,
               data: [256, 230, 245, 287, 240, 250, 230, 295, 331, 431, 456, 521],
             },
             {
-              label: "Moderate Incidents",
-              borderColor: gradientStroke,
-              pointBackgroundColor: gradientStroke,
+              label: "Minor Fire",
+              borderColor: "#1d7af3",
+              pointBackgroundColor: "#1d7af3",
               pointRadius: 0,
-              backgroundColor: gradientFill,
-              legendColor: "#177dff",
+              backgroundColor: "rgba(29, 122, 243, 0.7)",
+              legendColor: "#1d7af3",
               fill: true,
               borderWidth: 1,
               data: [542, 480, 430, 550, 530, 453, 380, 434, 568, 610, 700, 900],
