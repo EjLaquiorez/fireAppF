@@ -415,20 +415,20 @@
             datasets: [
               {
                 label: severitylevel[0],
-                backgroundColor: "#177dff",
-                borderColor: "#177dff",
+                backgroundColor: "#f3545d",
+                borderColor: "#f3545d",
                 data: incidentCount_major,
               },
               {
                 label: severitylevel[1], 
-                backgroundColor: "#fdaf4b",
-                borderColor: "#fdaf4b",
+                backgroundColor: "#1d7af3",
+                borderColor: "#1d7af3",
                 data: incidentCounts_minor,
               },
               {
                 label: severitylevel[2],
-                backgroundColor: "#59d05d",
-                borderColor: "#59d05d", 
+                backgroundColor: "#fdaf4b",
+                borderColor: "#fdaf4b", 
                 data: incidentCounts_moderate,
               },
             ],
@@ -509,7 +509,15 @@
           data: {
             datasets: [{
               data: Object.values(data),
-              backgroundColor: ["#f3545d", "#fdaf4b", "#1d7af3"]
+              backgroundColor: [
+                "#f3545d",    // Red for Structural
+                "#fdaf4b",    // Orange for Electrical
+                "#1d7af3",    // Blue for Vehicle
+                "#59d05d",    // Green for Chemical
+                "#716aca"     // Purple for Forest
+              ],
+              borderWidth: 2,
+              borderColor: 'white'
             }],
             labels: Object.keys(data)
           },
@@ -517,7 +525,44 @@
             responsive: true,
             maintainAspectRatio: false,
             legend: {
-              position: "bottom"
+              position: "bottom",
+              labels: {
+                fontColor: "rgb(154, 154, 154)",
+                fontSize: 11,
+                usePointStyle: true,
+                padding: 20,
+                generateLabels: function(chart) {
+                  const data = chart.data;
+                  if (data.labels.length && data.datasets.length) {
+                    const dataset = data.datasets[0];
+                    const total = dataset.data.reduce((acc, value) => acc + value, 0);
+                    return data.labels.map((label, i) => {
+                      const value = dataset.data[i];
+                      const percentage = ((value / total) * 100).toFixed(1);
+                      return {
+                        text: `${label}: ${value} (${percentage}%)`,
+                        fillStyle: dataset.backgroundColor[i],
+                        strokeStyle: dataset.borderColor,
+                        lineWidth: dataset.borderWidth,
+                        hidden: isNaN(dataset.data[i]) || chart.getDatasetMeta(0).data[i].hidden,
+                        index: i
+                      };
+                    });
+                  }
+                  return [];
+                }
+              }
+            },
+            tooltips: {
+              callbacks: {
+                label: function(tooltipItem, data) {
+                  const dataset = data.datasets[tooltipItem.datasetIndex];
+                  const total = dataset.data.reduce((acc, current) => acc + current, 0);
+                  const currentValue = dataset.data[tooltipItem.index];
+                  const percentage = ((currentValue/total) * 100).toFixed(1);
+                  return ` ${data.labels[tooltipItem.index]}: ${currentValue} (${percentage}%)`;
+                }
+              }
             },
             layout: {
               padding: {
@@ -525,6 +570,21 @@
                 right: 20,
                 top: 20,
                 bottom: 20
+              }
+            },
+            plugins: {
+              datalabels: {
+                color: '#fff',
+                font: {
+                  weight: 'bold',
+                  size: 11
+                },
+                formatter: (value, ctx) => {
+                  const dataset = ctx.chart.data.datasets[0];
+                  const total = dataset.data.reduce((acc, current) => acc + current, 0);
+                  const percentage = ((value/total) * 100).toFixed(1);
+                  return percentage + '%';
+                }
               }
             }
           }
@@ -777,22 +837,22 @@
         data: {
           datasets: [
             {
-              label: "Car",
+              label: "Structure Fires",
               data: [
                 { x: 25, y: 17, r: 25 },
                 { x: 30, y: 25, r: 28 },
                 { x: 35, y: 30, r: 8 },
               ],
-              backgroundColor: "#716aca",
+              backgroundColor: "#f3545d",
             },
             {
-              label: "Motorcycles",
+              label: "Vehicle Fires",
               data: [
                 { x: 10, y: 17, r: 20 },
                 { x: 30, y: 10, r: 7 },
                 { x: 35, y: 20, r: 10 },
               ],
-              backgroundColor: "#1d7af3",
+              backgroundColor: "#fdaf4b",
             },
           ],
         },
@@ -803,21 +863,37 @@
             position: "bottom",
           },
           scales: {
-            yAxes: [
-              {
-                ticks: {
-                  beginAtZero: true,
-                },
+            yAxes: [{
+              scaleLabel: {
+                display: true,
+                labelString: 'Response Time (minutes)'
               },
-            ],
-            xAxes: [
-              {
-                ticks: {
-                  beginAtZero: true,
-                },
+              ticks: {
+                beginAtZero: true,
               },
-            ],
+            }],
+            xAxes: [{
+              scaleLabel: {
+                display: true,
+                labelString: 'Distance from Station (km)'
+              },
+              ticks: {
+                beginAtZero: true,
+              },
+            }],
           },
+          tooltips: {
+            callbacks: {
+              label: function(tooltipItem, data) {
+                var dataset = data.datasets[tooltipItem.datasetIndex];
+                var dataPoint = dataset.data[tooltipItem.index];
+                return dataset.label + ': ' +
+                  'Distance: ' + dataPoint.x + 'km, ' +
+                  'Response Time: ' + dataPoint.y + 'min, ' +
+                  'Damage Extent: ' + dataPoint.r;
+              }
+            }
+          }
         },
       });
       // var myMultipleLineChart = new Chart(multipleLineChart, {
@@ -947,7 +1023,7 @@
       var myHtmlLegendsChart = new Chart(htmlLegendsChart, {
         type: "line",
         data: {
-          labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov","Dec"],
+          labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
           datasets: [
             {
               label: "Major Fire",
@@ -958,7 +1034,7 @@
               legendColor: "#f3545d",
               fill: true,
               borderWidth: 1,
-              data: [154, 184, 175, 203, 210, 231, 240, 278, 252, 312, 320, 374],
+              data: [15, 18, 17, 20, 21, 23, 24, 27, 25, 31, 32, 37],
             },
             {
               label: "Moderate Fire",
@@ -969,7 +1045,7 @@
               legendColor: "#fdaf4b",
               fill: true,
               borderWidth: 1,
-              data: [256, 230, 245, 287, 240, 250, 230, 295, 331, 431, 456, 521],
+              data: [25, 23, 24, 28, 24, 25, 23, 29, 33, 43, 45, 52],
             },
             {
               label: "Minor Fire",
@@ -980,7 +1056,7 @@
               legendColor: "#1d7af3",
               fill: true,
               borderWidth: 1,
-              data: [542, 480, 430, 550, 530, 453, 380, 434, 568, 610, 700, 900],
+              data: [54, 48, 43, 55, 53, 45, 38, 43, 56, 61, 70, 90],
             },
           ],
         },
@@ -998,6 +1074,12 @@
             xPadding: 10,
             yPadding: 10,
             caretPadding: 10,
+            callbacks: {
+              label: function(tooltipItem, data) {
+                return data.datasets[tooltipItem.datasetIndex].label + 
+                       ': ' + tooltipItem.value + ' incidents';
+              }
+            }
           },
           layout: {
             padding: { left: 15, right: 15, top: 15, bottom: 15 },
