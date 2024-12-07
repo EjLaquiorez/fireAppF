@@ -12,12 +12,50 @@ class BaseModel(models.Model):
 class Locations(BaseModel):
     name = models.CharField(max_length=150)
     latitude = models.DecimalField(
-        max_digits=22, decimal_places=16, null=True, blank=True)
+        max_digits=22, 
+        decimal_places=16, 
+        null=True, 
+        blank=True,
+        help_text="Latitude coordinate of the location"
+    )
     longitude = models.DecimalField(
-        max_digits=22, decimal_places=16, null=True, blank=True)
-    address = models.CharField(max_length=150)
-    city = models.CharField(max_length=150)  # can be in separate table
-    country = models.CharField(max_length=150)  # can be in separate table
+        max_digits=22, 
+        decimal_places=16, 
+        null=True, 
+        blank=True,
+        help_text="Longitude coordinate of the location"
+    )
+    address = models.CharField(
+        max_length=500,  # Increased to accommodate full addresses
+        blank=True,
+        help_text="Full address from geocoding"
+    )
+    city = models.CharField(
+        max_length=150,
+        blank=True,
+        help_text="City name"
+    )
+    country = models.CharField(
+        max_length=150,
+        blank=True,
+        help_text="Country name"
+    )
+
+    def __str__(self):
+        return self.name
+
+    def get_coordinates(self):
+        if self.latitude and self.longitude:
+            return (self.latitude, self.longitude)
+        return None
+
+    def update_from_coordinates(self, latitude, longitude, address_data):
+        self.latitude = latitude
+        self.longitude = longitude
+        self.address = address_data.get('display_name', '')
+        self.city = address_data.get('address', {}).get('city', '')
+        self.country = address_data.get('address', {}).get('country', '')
+        self.save()
 
 
 class Incident(BaseModel):

@@ -1,5 +1,5 @@
 from django import forms
-from .models import Incident
+from .models import Incident, Locations
 
 class IncidentForm(forms.ModelForm):
     latitude = forms.FloatField(widget=forms.HiddenInput(), required=False)
@@ -40,6 +40,49 @@ class IncidentForm(forms.ModelForm):
                     'class': 'form-control',
                     'rows': 3,
                     'placeholder': 'Enter incident description'
+                }
+            ),
+        }
+
+class LocationForm(forms.ModelForm):
+    class Meta:
+        model = Locations
+        fields = ['name', 'address', 'city', 'country', 'latitude', 'longitude']
+        widgets = {
+            'name': forms.TextInput(
+                attrs={
+                    'class': 'form-control',
+                    'placeholder': 'Enter location name'
+                }
+            ),
+            'address': forms.TextInput(
+                attrs={
+                    'class': 'form-control',
+                    'placeholder': 'Enter address'
+                }
+            ),
+            'city': forms.TextInput(
+                attrs={
+                    'class': 'form-control',
+                    'placeholder': 'Enter city'
+                }
+            ),
+            'country': forms.TextInput(
+                attrs={
+                    'class': 'form-control',
+                    'placeholder': 'Enter country'
+                }
+            ),
+            'latitude': forms.NumberInput(
+                attrs={
+                    'class': 'form-control',
+                    'step': 'any'
+                }
+            ),
+            'longitude': forms.NumberInput(
+                attrs={
+                    'class': 'form-control',
+                    'step': 'any'
                 }
             ),
         }

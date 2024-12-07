@@ -4,7 +4,7 @@
 {% block content %}
 <div class="page-inner">
   <div class="page-header">
-    <h4 class="page-title">{% if object %}Update Location{% else %}Add Location{% endif %}</h4>
+    <h4 class="page-title">Delete Location</h4>
     <ul class="breadcrumbs">
       <li class="nav-home">
         <a href="{% url 'home' %}">
@@ -21,7 +21,7 @@
         <i class="flaticon-right-arrow"></i>
       </li>
       <li class="nav-item">
-        <a href="#">{% if object %}Edit{% else %}Add{% endif %}</a>
+        <a href="#">Delete</a>
       </li>
     </ul>
   </div>
@@ -30,24 +30,15 @@
     <div class="col-md-12">
       <div class="card">
         <div class="card-header">
-          <h4 class="card-title">Incident Details</h4>
+          <h4 class="card-title">Confirm Deletion</h4>
         </div>
         <div class="card-body">
           <form method="post">
             {% csrf_token %}
-            <div class="row">
-              <div class="col-md-12">
-                <div class="form-group">
-                  {{ form.as_p }}
-                  <a href="{% url 'location-create' %}" class="btn btn-success">
-                    <i class="fas fa-plus"></i> Add New Location
-                  </a>
-                </div>
-              </div>
-            </div>
+            <p>Are you sure you want to delete "{{ object }}"?</p>
             <div class="card-action">
-              <button type="submit" class="btn btn-primary">Save</button>
-              <a href="{% url 'location-list' %}" class="btn btn-danger">Cancel</a>
+              <button type="submit" class="btn btn-danger">Confirm Delete</button>
+              <a href="{% url 'location-list' %}" class="btn btn-default">Cancel</a>
             </div>
           </form>
         </div>

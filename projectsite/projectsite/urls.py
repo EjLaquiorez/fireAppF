@@ -14,7 +14,11 @@ from fire.views import (
     doughnut_chart,
     radar_chart,
     incident_list_table,
-    MapIncidentView
+    MapIncidentView,
+    LocationListView,
+    LocationCreateView,
+    LocationUpdateView,
+    LocationDeleteView
 )
 
 from fire import views
@@ -43,4 +47,8 @@ urlpatterns = [
     path('doughnutChart/', doughnut_chart, name='doughnut_chart'),
     path('radarChart/', radar_chart, name='radar_chart'),
     path('map/incident/', MapIncidentView.as_view(), name='map-incident'),
+    path('locations/', LocationListView.as_view(), name='location-list'),
+    path('locations/add/', LocationCreateView.as_view(), name='location-create'),
+    path('locations/<int:pk>/edit/', LocationUpdateView.as_view(), name='location-update'),
+    path('locations/<int:pk>/delete/', LocationDeleteView.as_view(), name='location-delete'),
 ]

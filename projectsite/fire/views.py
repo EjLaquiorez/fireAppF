@@ -10,7 +10,7 @@ from datetime import datetime
 from django.contrib import messages
 
 from .models import Locations, Incident, FireStation
-from .forms import IncidentForm
+from .forms import IncidentForm, LocationForm
 
 import requests
 from django.conf import settings
@@ -401,3 +401,25 @@ def incident_list_table(request):
 
 class MapIncidentView(TemplateView):
     template_name = 'fire/map_incident.html'
+
+class LocationListView(ListView):
+    model = Locations
+    template_name = 'location_list.html'
+    context_object_name = 'locations'
+
+class LocationCreateView(CreateView):
+    model = Locations
+    form_class = LocationForm
+    template_name = 'location_form.html'
+    success_url = reverse_lazy('location-list')
+
+class LocationUpdateView(UpdateView):
+    model = Locations
+    form_class = LocationForm
+    template_name = 'location_form.html'
+    success_url = reverse_lazy('location-list')
+
+class LocationDeleteView(DeleteView):
+    model = Locations
+    template_name = 'location_confirm_delete.html'
+    success_url = reverse_lazy('location-list')
