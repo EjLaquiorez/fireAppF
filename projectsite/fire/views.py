@@ -1,11 +1,11 @@
 from django.shortcuts import get_object_or_404, redirect, render
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView, TemplateView
 from django.urls import reverse_lazy
 from django.db import connection
 from django.http import JsonResponse
 from django.db.models.functions import ExtractMonth
 
-from django.db.models import Count, Avg
+from django.db.models import Count, Avg, Q
 from datetime import datetime
 from django.contrib import messages
 
@@ -235,6 +235,7 @@ class IncidentUpdateView(UpdateView):
 class IncidentDeleteView(DeleteView):
     model = Incident
     success_url = reverse_lazy('incident-list')
+    template_name = 'incident_confirm_delete.html'
 
     def delete(self, request, *args, **kwargs):
         messages.success(request, 'Incident deleted successfully!')
@@ -375,3 +376,28 @@ def radar_chart(request):
     metric_data = Incident.objects.values('metric').annotate(value=Avg('value'))
     data = {item['metric']: item['value'] for item in metric_data}
     return JsonResponse(data)
+
+def incident_list_table(request):
+    # Get the search query from the URL parameters
+    query = request.GET.get('q', '')
+    
+    # Get all incidents and filter based on search query if it exists
+    if query:
+        incidents = Incident.objects.filter(
+            Q(location__icontains=query) |
+            Q(severity__icontains=query) |
+            Q(status__icontains=query)
+        ).order_by('-date')
+    else:
+        incidents = Incident.objects.all().order_by('-date')
+    
+    # Create the context dictionary to pass to the template
+    context = {
+        'incidents': incidents,
+    }
+    
+    # Render the template with the context
+    return render(request, 'incident_list.html', context)
+
+class MapIncidentView(TemplateView):
+    template_name = 'fire/map_incident.html'

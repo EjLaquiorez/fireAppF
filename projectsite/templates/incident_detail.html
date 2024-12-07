@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Incident Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Date & Time:</strong> {{ incident.date_time|date:"F d, Y H:i" }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Location:</strong> {{ incident.location.name }}
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Incident Type:</strong> {{ incident.incident_type }}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Severity Level:</strong> {{ incident.severity_level }}
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Status:</strong> 
+                            <span class="badge {% if incident.status == 'active' %}bg-danger{% else %}bg-success{% endif %}">
+                                {{ incident.status|title }}
+                            </span>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Coordinates:</strong> 
+                            {{ incident.location.latitude }}, {{ incident.location.longitude }}
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <strong>Description:</strong>
+                            <p>{{ incident.description|default:"No description provided" }}</p>
+                        </div>
+                    </div>
+
+                    {% if incident.weatherconditions_set.exists %}
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <strong>Weather Conditions:</strong>
+                            {% for weather in incident.weatherconditions_set.all %}
+                            <div class="mt-2">
+                                <p>Temperature: {{ weather.temperature }}°C</p>
+                                <p>Humidity: {{ weather.humidity }}%</p>
+                                <p>Wind Speed: {{ weather.wind_speed }} m/s</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="mt-3">
+                        <a href="{% url 'incident-list' %}" class="btn btn-secondary">Back to List</a>
+                        <a href="{% url 'incident-update' incident.pk %}" class="btn btn-primary">Edit</a>
+                        <a href="{% url 'incident-delete' incident.pk %}" class="btn btn-danger">Delete</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
