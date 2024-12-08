@@ -1,4 +1,6 @@
 from django import forms
+from django.core.exceptions import ValidationError
+from django.utils import timezone
 from .models import Incident, Locations
 
 class IncidentForm(forms.ModelForm):
@@ -43,6 +45,30 @@ class IncidentForm(forms.ModelForm):
                 }
             ),
         }
+
+    def clean_date_time(self):
+        date_time = self.cleaned_data.get('date_time')
+        if date_time > timezone.now():
+            raise ValidationError("Future dates are not allowed.")
+        return date_time
+
+    def clean_temperature(self):
+        temperature = self.cleaned_data.get('temperature')
+        if temperature < 0:
+            raise ValidationError("Temperature cannot be negative.")
+        return temperature
+
+    def clean_humidity(self):
+        humidity = self.cleaned_data.get('humidity')
+        if humidity < 0:
+            raise ValidationError("Humidity cannot be negative.")
+        return humidity
+
+    def clean_wind_speed(self):
+        wind_speed = self.cleaned_data.get('wind_speed')
+        if wind_speed < 0:
+            raise ValidationError("Wind speed cannot be negative.")
+        return wind_speed
 
 class LocationForm(forms.ModelForm):
     class Meta:

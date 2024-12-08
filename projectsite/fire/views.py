@@ -238,8 +238,10 @@ class IncidentDeleteView(DeleteView):
     template_name = 'incident_confirm_delete.html'
 
     def delete(self, request, *args, **kwargs):
+        response = super().delete(request, *args, **kwargs)
         messages.success(request, 'Incident deleted successfully!')
-        return super().delete(request, *args, **kwargs)
+        print("Incident deleted successfully!")  # Debugging line
+        return response
 
 def map_incident(request):
     try:
