@@ -10,7 +10,7 @@ from datetime import datetime
 from django.contrib import messages
 
 from .models import Locations, Incident, FireStation, Firefighters
-from .forms import IncidentForm, LocationForm, FirefighterForm
+from .forms import IncidentForm, LocationForm, FirefighterForm, FireStationForm
 
 import requests
 from django.conf import settings
@@ -462,3 +462,34 @@ class FirefighterDeleteView(DeleteView):
         response = super().delete(request, *args, **kwargs)
         messages.success(request, 'Firefighter deleted successfully!')
         return response
+
+class FireStationListView(ListView):
+    model = FireStation
+    template_name = 'firestation_list.html'
+    context_object_name = 'fireStations'
+
+class FireStationCreateView(CreateView):
+    model = FireStation
+    template_name = 'firestation_create.html'
+    form_class = FireStationForm
+    success_url = reverse_lazy('firestation-list')
+
+class FireStationUpdateView(UpdateView):
+    model = FireStation
+    template_name = 'firestation_update.html'
+    form_class = FireStationForm
+    success_url = reverse_lazy('firestation-list')
+
+class FireStationDeleteView(DeleteView):
+    model = FireStation
+    template_name = 'firestation_delete.html'
+    success_url = reverse_lazy('firestation-list')
+
+def firestation_map(request):
+    fireStations = FireStation.objects.all()
+    context = {
+        'fireStations': fireStations,
+        'center_lat': 9.81644,  # Default center latitude
+        'center_lng': 118.72239,  # Default center longitude
+    }
+    return render(request, 'firestation_map.html', context)

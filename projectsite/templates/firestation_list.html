@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="page-inner">
+  <div class="page-header">
+    <h4 class="page-title">Fire Stations</h4>
+    <ul class="breadcrumbs">
+      <li class="nav-home">
+        <a href="{% url 'home' %}">
+          <i class="flaticon-home"></i>
+        </a>
+      </li>
+      <li class="separator">
+        <i class="flaticon-right-arrow"></i>
+      </li>
+      <li class="nav-item">
+        <a href="#">Fire Stations</a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header">
+          <div class="d-flex align-items-center">
+            <h4 class="card-title">Fire Station List</h4>
+            <a href="{% url 'firestation-create' %}" class="btn btn-primary btn-round ml-auto">
+              <i class="fa fa-plus"></i>
+              Add Fire Station
+            </a>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Address</th>
+                  <th>City</th>
+                  <th>Country</th>
+                  <th>Latitude</th>
+                  <th>Longitude</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for firestation in fireStations %}
+                <tr>
+                  <td>{{ firestation.name }}</td>
+                  <td>{{ firestation.address }}</td>
+                  <td>{{ firestation.city }}</td>
+                  <td>{{ firestation.country }}</td>
+                  <td>{{ firestation.latitude }}</td>
+                  <td>{{ firestation.longitude }}</td>
+                  <td>
+                    <div class="d-flex">
+                      <a href="{% url 'firestation-update' firestation.pk %}" class="btn btn-warning btn-sm mr-2" title="Edit Fire Station">
+                        <i class="fa fa-edit"></i> Edit
+                      </a>
+                      <a href="{% url 'firestation-delete' firestation.pk %}" class="btn btn-danger btn-sm" title="Delete Fire Station">
+                        <i class="fa fa-trash"></i> Delete
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

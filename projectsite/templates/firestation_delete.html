@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="page-inner">
+  <div class="page-header">
+    <h4 class="page-title">Delete Fire Station</h4>
+    <ul class="breadcrumbs">
+      <li class="nav-home">
+        <a href="{% url 'home' %}">
+          <i class="flaticon-home"></i>
+        </a>
+      </li>
+      <li class="separator">
+        <i class="flaticon-right-arrow"></i>
+      </li>
+      <li class="nav-item">
+        <a href="{% url 'firestation-list' %}">Fire Stations</a>
+      </li>
+      <li class="separator">
+        <i class="flaticon-right-arrow"></i>
+      </li>
+      <li class="nav-item">
+        <a href="#">Delete</a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header">
+          <h4 class="card-title">Confirm Deletion</h4>
+        </div>
+        <div class="card-body">
+          <form method="post">
+            {% csrf_token %}
+            <p>Are you sure you want to delete "{{ object }}"? This action cannot be undone.</p>
+            <div class="card-action">
+              <button type="button" class="btn btn-secondary" onclick="window.history.back()">Cancel</button>
+              <button type="submit" class="btn btn-danger">Delete</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django.urls import reverse_lazy
+from .models import FireStation
+from .forms import FireStationForm
+
+class FireStationListView(ListView):
+    model = FireStation
+    template_name = 'firestation_list.html'
+    context_object_name = 'fireStations'
+
+class FireStationCreateView(CreateView):
+    model = FireStation
+    template_name = 'firestation_create.html'
+    form_class = FireStationForm
+    success_url = reverse_lazy('firestation-list')
+
+class FireStationUpdateView(UpdateView):
+    model = FireStation
+    template_name = 'firestation_update.html'
+    form_class = FireStationForm
+    success_url = reverse_lazy('firestation-list')
+
+class FireStationDeleteView(DeleteView):
+    model = FireStation
+    template_name = 'firestation_delete.html'
+    success_url = reverse_lazy('firestation-list')

@@ -9,6 +9,18 @@ class BaseModel(models.Model):
         abstract = True
 
 
+class Location(models.Model):
+    name = models.CharField(max_length=150)
+    latitude = models.DecimalField(max_digits=22, decimal_places=16, null=True, blank=True)
+    longitude = models.DecimalField(max_digits=22, decimal_places=16, null=True, blank=True)
+    address = models.CharField(max_length=500, blank=True)
+    city = models.CharField(max_length=150, blank=True)
+    country = models.CharField(max_length=150, blank=True)
+
+    def __str__(self):
+        return self.name
+
+
 class Locations(BaseModel):
     name = models.CharField(max_length=150)
     latitude = models.DecimalField(
@@ -106,14 +118,52 @@ class Incident(BaseModel):
 
 class FireStation(models.Model):
     name = models.CharField(max_length=150)
-    address = models.CharField(max_length=150)
-    city = models.CharField(max_length=150)
-    country = models.CharField(max_length=150)
-    latitude = models.DecimalField(max_digits=22, decimal_places=16, null=True, blank=True)
-    longitude = models.DecimalField(max_digits=22, decimal_places=16, null=True, blank=True)
+    location = models.ForeignKey(Location, on_delete=models.CASCADE, null=True, blank=True)
+    latitude = models.DecimalField(
+        max_digits=22, 
+        decimal_places=16, 
+        null=True, 
+        blank=True,
+        help_text="Latitude coordinate of the location"
+    )
+    longitude = models.DecimalField(
+        max_digits=22, 
+        decimal_places=16, 
+        null=True, 
+        blank=True,
+        help_text="Longitude coordinate of the location"
+    )
+    address = models.CharField(
+        max_length=500,  # Increased to accommodate full addresses
+        blank=True,
+        help_text="Full address from geocoding"
+    )
+    city = models.CharField(
+        max_length=150,
+        blank=True,
+        help_text="City name"
+    )
+    country = models.CharField(
+        max_length=150,
+        blank=True,
+        help_text="Country name"
+    )
 
     def __str__(self):
         return self.name
+
+    def get_coordinates(self):
+        if self.latitude and self.longitude:
+            return (self.latitude, self.longitude)
+        return None
+
+    def update_from_coordinates(self, latitude, longitude, address_data):
+        self.latitude = latitude
+        self.longitude = longitude
+        self.address = address_data.get('display_name', '')
+        self.city = address_data.get('address', {}).get('city', '')
+        self.country = address_data.get('address', {}).get('country', '')
+        self.save()
 
 
 class Firefighters(models.Model):

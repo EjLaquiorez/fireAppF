@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="page-inner">
+  <div class="page-header">
+    <h4 class="page-title">{% if object %}Update Fire Station{% else %}Add Fire Station{% endif %}</h4>
+    <ul class="breadcrumbs">
+      <li class="nav-home">
+        <a href="{% url 'home' %}">
+          <i class="flaticon-home"></i>
+        </a>
+      </li>
+      <li class="separator">
+        <i class="flaticon-right-arrow"></i>
+      </li>
+      <li class="nav-item">
+        <a href="{% url 'firestation-list' %}">Fire Stations</a>
+      </li>
+      <li class="separator">
+        <i class="flaticon-right-arrow"></i>
+      </li>
+      <li class="nav-item">
+        <a href="#">{% if object %}Edit{% else %}Add{% endif %}</a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header">
+          <h4 class="card-title">Fire Station Details</h4>
+        </div>
+        <div class="card-body">
+          <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  {{ form.as_p }}
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div id="map" style="width: 100%; height: 400px;"></div>
+                <div id="coordinates-display" class="mt-2">
+                  <small class="text-muted">Coordinates: <span id="coord-display">No location selected</span></small>
+                  <br>
+                  <small class="text-muted">Address: <span id="address-display">No address available</span></small>
+                </div>
+                <input type="hidden" id="latitude" name="latitude" value="{{ object.latitude|default_if_none:'' }}">
+                <input type="hidden" id="longitude" name="longitude" value="{{ object.longitude|default_if_none:'' }}">
+              </div>
+            </div>
+            <div class="card-action">
+              <button type="submit" class="btn btn-primary">Save</button>
+              <a href="{% url 'firestation-list' %}" class="btn btn-danger">Cancel</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+
+<style>
+  .card-action {
+    padding-top: 20px;
+    border-top: 1px solid #ebedf2;
+    margin-top: 20px;
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    // Initialize map
+    const map = L.map('map').setView([0, 0], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 18,
+    }).addTo(map);
+
+    const latitudeField = document.getElementById('latitude');
+    const longitudeField = document.getElementById('longitude');
+    
+    // Update default location to PSU
+    const defaultLocation = {
+      lat: 9.737572, 
+      lng: 118.736691
+    };
+    const lat = parseFloat(latitudeField.value) || defaultLocation.lat;
+    const lng = parseFloat(longitudeField.value) || defaultLocation.lng;
+
+    // Add marker
+    const marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+    map.setView([lat, lng], 13);
+
+    // Add map controls
+    const customControl = L.Control.extend({
+      options: {
+        position: 'topright'
+      },
+      onAdd: function() {
+        const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+        
+        // Set Current Location button
+        const setLocationButton = L.DomUtil.create('a', '', container);
+        setLocationButton.innerHTML = 'Set Current Location';
+        setLocationButton.href = '#';
+        setLocationButton.style.width = 'auto';
+        setLocationButton.style.padding = '0 10px';
+        
+        L.DomEvent.on(setLocationButton, 'click', function(e) {
+          L.DomEvent.preventDefault(e);
+          if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition(async function(position) {
+              const currentLocation = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
+              };
+              marker.setLatLng(currentLocation);
+              map.setView(currentLocation, 13);
+              await updateCoordinates(currentLocation.lat, currentLocation.lng);
+              
+              // Update name field with city or address
+              const nameField = document.getElementById('id_name');
+              if (nameField) {
+                const cityValue = document.getElementById('id_city').value;
+                nameField.value = cityValue || 'New Location';
+              }
+            }, function(error) {
+              alert("Error getting location: " + error.message);
+            });
+          } else {
+            alert("Geolocation is not supported by your browser");
+          }
+        });
+        
+        return container;
+      }
+    });
+    
+    map.addControl(new customControl());
+
+    // Update coordinates when marker is moved
+    marker.on('moveend', function(e) {
+      const position = e.target.getLatLng();
+      updateCoordinates(position.lat, position.lng);
+    });
+
+    // Click on map to move marker
+    map.on('click', function(e) {
+      marker.setLatLng(e.latlng);
+      updateCoordinates(e.latlng.lat, e.latlng.lng);
+    });
+
+    function updateCoordinates(lat, lng) {
+      latitudeField.value = lat.toFixed(6);
+      longitudeField.value = lng.toFixed(6);
+      document.getElementById('coord-display').textContent = 
+        `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+      getLocationDetails(lat, lng);
+    }
+
+    // Enhanced Reverse Geocoding with form field updates
+    async function getLocationDetails(lat, lng) {
+      try {
+        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+        const data = await response.json();
+        document.getElementById('address-display').textContent = data.display_name;
+        
+        // Update form fields based on the address components
+        if (data.address) {
+          // Build full address
+          const addressParts = [
+            data.address.house_number,
+            data.address.road,
+            data.address.suburb,
+            data.address.city || data.address.town || data.address.village
+          ].filter(Boolean);
+          
+          const fullAddress = addressParts.join(', ');
+          
+          // Update all form fields including name
+          if (document.getElementById('id_name'))
+            document.getElementById('id_name').value = fullAddress;
+            
+          if (document.getElementById('id_address'))
+            document.getElementById('id_address').value = fullAddress;
+            
+          if (document.getElementById('id_city'))
+            document.getElementById('id_city').value = data.address.city || data.address.town || data.address.village;
+            
+          if (document.getElementById('id_country'))
+            document.getElementById('id_country').value = data.address.country;
+            
+          if (document.getElementById('id_latitude'))
+            document.getElementById('id_latitude').value = lat;
+            
+          if (document.getElementById('id_longitude'))
+            document.getElementById('id_longitude').value = lng;
+        }
+      } catch (error) {
+        console.error('Reverse Geocoding Error:', error);
+        document.getElementById('address-display').textContent = 'Address lookup failed';
+      }
+    }
+
+    // Initial coordinates display
+    if (lat && lng) {
+      updateCoordinates(lat, lng);
+    }
+  });
+</script>
+{% endblock %}

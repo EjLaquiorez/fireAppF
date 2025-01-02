@@ -20,7 +20,12 @@ from fire.views import (
     LocationUpdateView,
     LocationDeleteView,
     FirefighterListView, FirefighterCreateView, FirefighterUpdateView, FirefighterDeleteView,
-    map_station
+    map_station,
+    FireStationListView,
+    FireStationCreateView,
+    FireStationUpdateView,
+    FireStationDeleteView,
+    firestation_map,
 )
 
 from fire import views
@@ -29,8 +34,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', HomePageView.as_view(), name='home'),
     path('dashboard_chart', ChartView.as_view(), name='dashboard-chart'),
-    path('chart/', PieCountbySeverity, name='pie-chart'),
-    path('lineChart/', LineCountbyMonth, name='line-chart'), 
+    path('lineChart/', LineCountbyMonth, name='line-chart'),
     path('multilineChart/', MultilineIncidentTop3Country, name='multiline-chart'),
     path('multiBarChart/', multipleBarbySeverity, name='multibar-chart'),
     path('incident/add/', IncidentCreateView.as_view(), name='incident-create'),
@@ -55,5 +59,10 @@ urlpatterns = [
     path('firefighters/create/', FirefighterCreateView.as_view(), name='create_firefighter'),
     path('firefighters/update/<int:pk>/', FirefighterUpdateView.as_view(), name='update_firefighter'),
     path('firefighters/delete/<int:pk>/', FirefighterDeleteView.as_view(), name='delete_firefighter'),
-    path('firefighters/map/', map_station, name='map_station'),  
+    path('firefighters/map/', map_station, name='map_station'),
+    path('firestations/', FireStationListView.as_view(), name='firestation-list'),
+    path('firestations/create/', FireStationCreateView.as_view(), name='firestation-create'),
+    path('firestations/update/<int:pk>/', FireStationUpdateView.as_view(), name='firestation-update'),
+    path('firestations/delete/<int:pk>/', FireStationDeleteView.as_view(), name='firestation-delete'),
+    path('firestations/map/', firestation_map, name='firestation-map'),
 ]
