@@ -263,11 +263,6 @@
                         <span class="sub-item">List of FireStations</span>
                       </a>
                     </li>
-                    <li>
-                      <a href="{% url 'firestation-map' %}">
-                        <span class="sub-item">Maps</span>
-                      </a>
-                    </li>
                   </ul>
                 </div>
               </li>
@@ -287,7 +282,27 @@
                   </ul>
                 </div>
               </li>
-              <!-- Add more navigation items here -->
+              <li class="nav-item">
+                <a data-toggle="collapse" href="#maps">
+                  <i class="fas fa-map"></i>
+                  <p>Maps</p>
+                  <span class="caret"></span>
+                </a>
+                <div class="collapse" id="maps">
+                  <ul class="nav nav-collapse">
+                    <li>
+                      <a href="{% url 'map-incident' %}">
+                        <span class="sub-item">Incident Map</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="{% url 'firestation-map' %}">
+                        <span class="sub-item">FireStation Map</span>
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </li>
             </ul>
           </div>
         </div>
