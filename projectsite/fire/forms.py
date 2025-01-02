@@ -1,7 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from django.utils import timezone
-from .models import Incident, Locations, Firefighters, FireStation
+from .models import Incident, Locations, Firefighters, FireStation, FireTruck
 
 class IncidentForm(forms.ModelForm):
     latitude = forms.FloatField(widget=forms.HiddenInput(), required=False)
@@ -122,3 +122,8 @@ class FireStationForm(forms.ModelForm):
     class Meta:
         model = FireStation
         fields = ['name', 'address', 'city', 'country', 'latitude', 'longitude']
+
+class FireTruckForm(forms.ModelForm):
+    class Meta:
+        model = FireTruck
+        fields = ['truck_number', 'model', 'capacity', 'station']

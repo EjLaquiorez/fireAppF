@@ -1,4 +1,6 @@
 from django.db import models
+from django.core.validators import MinValueValidator
+from django.utils import timezone
 
 
 class BaseModel(models.Model):
@@ -118,52 +120,14 @@ class Incident(BaseModel):
 
 class FireStation(models.Model):
     name = models.CharField(max_length=150)
-    location = models.ForeignKey(Location, on_delete=models.CASCADE, null=True, blank=True)
-    latitude = models.DecimalField(
-        max_digits=22, 
-        decimal_places=16, 
-        null=True, 
-        blank=True,
-        help_text="Latitude coordinate of the location"
-    )
-    longitude = models.DecimalField(
-        max_digits=22, 
-        decimal_places=16, 
-        null=True, 
-        blank=True,
-        help_text="Longitude coordinate of the location"
-    )
-    address = models.CharField(
-        max_length=500,  # Increased to accommodate full addresses
-        blank=True,
-        help_text="Full address from geocoding"
-    )
-    city = models.CharField(
-        max_length=150,
-        blank=True,
-        help_text="City name"
-    )
-    country = models.CharField(
-        max_length=150,
-        blank=True,
-        help_text="Country name"
-    )
+    address = models.CharField(max_length=255, null=True, blank=True)
+    city = models.CharField(max_length=100, null=True, blank=True)
+    country = models.CharField(max_length=100, null=True, blank=True)
+    latitude = models.FloatField(default=0.0)  # Provide a default value
+    longitude = models.FloatField(default=0.0)  # Provide a default value
 
     def __str__(self):
         return self.name
-
-    def get_coordinates(self):
-        if self.latitude and self.longitude:
-            return (self.latitude, self.longitude)
-        return None
-
-    def update_from_coordinates(self, latitude, longitude, address_data):
-        self.latitude = latitude
-        self.longitude = longitude
-        self.address = address_data.get('display_name', '')
-        self.city = address_data.get('address', {}).get('city', '')
-        self.country = address_data.get('address', {}).get('country', '')
-        self.save()
 
 
 class Firefighters(models.Model):
@@ -210,10 +174,18 @@ class Firefighters(models.Model):
 
 
 class FireTruck(models.Model):
-    truck_number = models.CharField(max_length=150)
-    model = models.CharField(max_length=150)
-    capacity = models.CharField(max_length=150)  # water
-    station = models.ForeignKey(FireStation, on_delete=models.CASCADE)
+    truck_number = models.CharField(max_length=150, unique=True, default='Unknown Truck Number')
+    model = models.CharField(max_length=150, default='Unknown Model')
+    capacity = models.PositiveIntegerField(validators=[MinValueValidator(1)], default=1000)  # water capacity in liters
+    station = models.ForeignKey('FireStation', on_delete=models.CASCADE, default=1)  # Assuming a default station with ID 1 exists
+
+    def __str__(self):
+        return f"{self.truck_number} - {self.model}"
+
+    class Meta:
+        ordering = ['truck_number']
+        verbose_name = 'Fire Truck'
+        verbose_name_plural = 'Fire Trucks'
 
 
 class WeatherConditions(models.Model):

@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h4 class="page-title my-3">Fire Trucks</h4>
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">List of Fire Trucks</h5>
+                    <p class="card-category">Manage and monitor fire trucks effectively</p>
+                </div>
+                <div class="card-body">
+                    <!-- Search and Add Buttons -->
+                    <div class="row mb-3">
+                        <div class="col-lg-6 col-md-6 col-sm-12">
+                            <form class="navbar-form" action="{% url 'firetruck-list' %}" method="get">
+                                <div class="input-group">
+                                    <input 
+                                        type="text" 
+                                        placeholder="Search ..." 
+                                        class="form-control" 
+                                        name="q" 
+                                        value="{{ request.GET.q|default:'' }}" />
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">
+                                            <i class="la la-search search-icon"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="col-lg-6 col-md-6 col-sm-12 text-right">
+                            <a href="{% url 'firetruck-create' %}" class="btn btn-success btn-rounded">
+                                <i class="la la-plus"></i> Add Fire Truck
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Fire Truck Table -->
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered mt-3">
+                            <thead>
+                                <tr>
+                                    <th>Truck Number</th>
+                                    <th>Model</th>
+                                    <th>Capacity</th>
+                                    <th>Station</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for firetruck in firetrucks %}
+                                <tr>
+                                    <td>{{ firetruck.truck_number }}</td>
+                                    <td>{{ firetruck.model }}</td>
+                                    <td>{{ firetruck.capacity }}</td>
+                                    <td>{{ firetruck.station.name }}</td>
+                                    <td class="text-center">
+                                        <a href="{% url 'firetruck-detail' firetruck.pk %}" class="btn btn-info btn-sm" title="View Fire Truck">
+                                            <i class="la la-eye"></i> View
+                                        </a>
+                                        <a href="{% url 'firetruck-update' firetruck.pk %}" class="btn btn-warning btn-sm" title="Edit Fire Truck">
+                                            <i class="la la-edit"></i> Edit
+                                        </a>
+                                        <a href="{% url 'firetruck-delete' firetruck.pk %}" class="btn btn-danger btn-sm" title="Delete Fire Truck">
+                                            <i class="la la-trash"></i> Delete
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center">
+                                        <p class="text-muted mb-0">No fire trucks found. Please add a new fire truck.</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="d-flex justify-content-center mt-3">
+                        {% include 'includes/pagination.html' %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Notifications and Delete Confirmation Script -->
+<script>
+function showNotification(type, message) {
+    swal({
+        title: type === 'success' ? 'Success' : 'Warning',
+        text: message,
+        icon: type,
+        buttons: false,
+        timer: 3000
+    });
+}
+
+function confirmDelete(deleteUrl) {
+    // Set the correct delete URL on the confirm button
+    document.getElementById('confirmDeleteButton').href = deleteUrl;
+    // Show the modal
+    $('#deleteModal').modal('show');
+}
+</script>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete this fire truck? This action cannot be undone.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <a href="#" id="confirmDeleteButton" class="btn btn-danger">Delete</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,16 +1,14 @@
 from django.shortcuts import get_object_or_404, redirect, render
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView, TemplateView, View
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView, TemplateView, View, DetailView
 from django.urls import reverse_lazy
 from django.db import connection
 from django.http import JsonResponse
 from django.db.models.functions import ExtractMonth
-
 from django.db.models import Count, Avg, Q
 from datetime import datetime
 from django.contrib import messages
-
-from .models import Locations, Incident, FireStation, Firefighters
-from .forms import IncidentForm, LocationForm, FirefighterForm, FireStationForm
+from .models import Locations, Incident, FireStation, Firefighters, FireTruck
+from .forms import IncidentForm, LocationForm, FirefighterForm, FireStationForm, FireTruckForm
 
 import requests
 from django.conf import settings
@@ -493,3 +491,30 @@ def firestation_map(request):
         'center_lng': 118.72239,  # Default center longitude
     }
     return render(request, 'firestation_map.html', context)
+
+class FireTruckListView(ListView):
+    model = FireTruck
+    template_name = 'firetruck_list.html'
+    context_object_name = 'firetrucks'
+
+class FireTruckDetailView(DetailView):
+    model = FireTruck
+    template_name = 'firetruck_detail.html'
+    context_object_name = 'firetruck'
+
+class FireTruckCreateView(CreateView):
+    model = FireTruck
+    form_class = FireTruckForm
+    template_name = 'firetruck_form.html'
+    success_url = '/firetrucks/'
+
+class FireTruckUpdateView(UpdateView):
+    model = FireTruck
+    form_class = FireTruckForm
+    template_name = 'firetruck_form.html'
+    success_url = '/firetrucks/'
+
+class FireTruckDeleteView(DeleteView):
+    model = FireTruck
+    template_name = 'firetruck_confirm_delete.html'
+    success_url = '/firetrucks/'

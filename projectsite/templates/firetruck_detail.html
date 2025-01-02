@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Fire Truck Details</h2>
+<table class="table table-bordered">
+    <tr>
+        <th>Truck Number</th>
+        <td>{{ firetruck.truck_number }}</td>
+    </tr>
+    <tr>
+        <th>Model</th>
+        <td>{{ firetruck.model }}</td>
+    </tr>
+    <tr>
+        <th>Capacity</th>
+        <td>{{ firetruck.capacity }}</td>
+    </tr>
+    <tr>
+        <th>Station</th>
+        <td>{{ firetruck.station.name }}</td>
+    </tr>
+    <tr>
+        <th>Created At</th>
+        <td>{{ firetruck.created_at }}</td>
+    </tr>
+    <tr>
+        <th>Updated At</th>
+        <td>{{ firetruck.updated_at }}</td>
+    </tr>
+</table>
+<a href="{% url 'firetruck-update' firetruck.pk %}" class="btn btn-warning">Edit</a>
+<a href="{% url 'firetruck-delete' firetruck.pk %}" class="btn btn-danger">Delete</a>
+<a href="{% url 'firetruck-list' %}" class="btn btn-secondary">Back to List</a>
+{% endblock %}
