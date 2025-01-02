@@ -26,7 +26,8 @@ from fire.views import (
     FireStationUpdateView,
     FireStationDeleteView,
     firestation_map,
-    FireTruckListView, FireTruckDetailView, FireTruckCreateView, FireTruckUpdateView, FireTruckDeleteView
+    FireTruckListView, FireTruckDetailView, FireTruckCreateView, FireTruckUpdateView, FireTruckDeleteView,
+    firetruck_list  # Add this line
 )
 
 from fire import views
@@ -56,20 +57,19 @@ urlpatterns = [
     path('locations/add/', LocationCreateView.as_view(), name='location-create'),
     path('locations/<int:pk>/edit/', LocationUpdateView.as_view(), name='location-update'),
     path('locations/<int:pk>/delete/', LocationDeleteView.as_view(), name='location-delete'),
-    path('firefighters/', FirefighterListView.as_view(), name='firefighter-list'),
+    path('firefighters/', views.firefighter_list, name='firefighter-list'),  # Update this line
     path('firefighters/create/', FirefighterCreateView.as_view(), name='create_firefighter'),
     path('firefighters/update/<int:pk>/', FirefighterUpdateView.as_view(), name='update_firefighter'),
     path('firefighters/delete/<int:pk>/', FirefighterDeleteView.as_view(), name='delete_firefighter'),
     path('firefighters/map/', map_station, name='map_station'),
-    path('firestations/', FireStationListView.as_view(), name='firestation-list'),
+    path('firestations/', views.firestation_list, name='firestation-list'),  # Update this line
     path('firestations/create/', FireStationCreateView.as_view(), name='firestation-create'),
     path('firestations/update/<int:pk>/', FireStationUpdateView.as_view(), name='firestation-update'),
     path('firestations/delete/<int:pk>/', FireStationDeleteView.as_view(), name='firestation-delete'),
     path('firestations/map/', firestation_map, name='firestation-map'),
-    path('firetrucks/', FireTruckListView.as_view(), name='firetruck-list'),
+    path('firetrucks/', views.firetruck_list, name='firetruck-list'),
     path('firetrucks/<int:pk>/', FireTruckDetailView.as_view(), name='firetruck-detail'),
     path('firetrucks/new/', FireTruckCreateView.as_view(), name='firetruck-create'),
     path('firetrucks/<int:pk>/edit/', FireTruckUpdateView.as_view(), name='firetruck-update'),
     path('firetrucks/<int:pk>/delete/', FireTruckDeleteView.as_view(), name='firetruck-delete'),
-    
 ]

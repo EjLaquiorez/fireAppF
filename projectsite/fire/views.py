@@ -518,3 +518,65 @@ class FireTruckDeleteView(DeleteView):
     model = FireTruck
     template_name = 'firetruck_confirm_delete.html'
     success_url = '/firetrucks/'
+
+from django.shortcuts import render
+from django.db.models import Q
+from .models import FireTruck
+
+def firetruck_list(request):
+    query = request.GET.get('q')
+    if (query):
+        firetrucks = FireTruck.objects.filter(
+            Q(truck_number__icontains=query) |
+            Q(model__icontains=query) |
+            Q(station__name__icontains=query)
+        )
+    else:
+        firetrucks = FireTruck.objects.all()
+    
+    context = {
+        'firetrucks': firetrucks,
+    }
+    return render(request, 'firetruck_list.html', context)
+
+from django.shortcuts import render
+from django.db.models import Q
+from .models import Firefighters
+
+def firefighter_list(request):
+    query = request.GET.get('q')
+    if query:
+        firefighters = Firefighters.objects.filter(
+            Q(name__icontains=query) |
+            Q(rank__icontains=query) |
+            Q(experience_level__icontains=query) |
+            Q(station__icontains=query)
+        )
+    else:
+        firefighters = Firefighters.objects.all()
+    
+    context = {
+        'firefighters': firefighters,
+    }
+    return render(request, 'firefighter_list.html', context)
+
+from django.shortcuts import render
+from django.db.models import Q
+from .models import FireStation
+
+def firestation_list(request):
+    query = request.GET.get('q')
+    if query:
+        fireStations = FireStation.objects.filter(
+            Q(name__icontains=query) |
+            Q(address__icontains=query) |
+            Q(city__icontains=query) |
+            Q(country__icontains=query)
+        )
+    else:
+        fireStations = FireStation.objects.all()
+    
+    context = {
+        'fireStations': fireStations,
+    }
+    return render(request, 'firestation_list.html', context)
