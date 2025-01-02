@@ -2,89 +2,107 @@
 {% load static %}
 
 {% block content %}
-<div class="container-fluid px-4">
-    <div class="row">
-        <div class="col-md-12">
-            <h4 class="page-title my-3">Firefighters</h4>
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title">List of Firefighters</h5>
-                    <p class="card-category">Manage and monitor firefighters effectively</p>
-                </div>
-                <div class="card-body">
-                    <!-- Search and Add Buttons -->
-                    <div class="row mb-3">
-                        <div class="col-lg-6 col-md-6 col-sm-12">
-                            <form class="navbar-form" action="{% url 'firefighter-list' %}" method="get">
-                                <div class="input-group">
-                                    <input 
-                                        type="text" 
-                                        placeholder="Search ..." 
-                                        class="form-control" 
-                                        name="q" 
-                                        value="{{ request.GET.q|default:'' }}" />
-                                    <div class="input-group-append">
-                                        <span class="input-group-text">
-                                            <i class="la la-search search-icon"></i>
-                                        </span>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                        <div class="col-lg-6 col-md-6 col-sm-12 text-right">
-                            <a href="{% url 'create_firefighter' %}" class="btn btn-success btn-rounded">
-                                <i class="la la-plus"></i> Add Firefighter
-                            </a>
-                        </div>
-                    </div>
+<div class="page-inner">
+  <div class="page-header">
+    <h4 class="page-title">Firefighters</h4>
+    <ul class="breadcrumbs">
+      <li class="nav-home">
+        <a href="{% url 'home' %}">
+          <i class="flaticon-home"></i>
+        </a>
+      </li>
+      <li class="separator">
+        <i class="flaticon-right-arrow"></i>
+      </li>
+      <li class="nav-item">
+        <a href="#">Firefighters</a>
+      </li>
+    </ul>
+  </div>
 
-                    <!-- Firefighter Table -->
-                    <div class="table-responsive">
-                        <table class="table table-striped table-bordered mt-3">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Rank</th>
-                                    <th>Experience Level</th>
-                                    <th>Station</th>
-                                    <th class="text-center">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for firefighter in firefighters %}
-                                <tr>
-                                    <td>{{ firefighter.name }}</td>
-                                    <td>{{ firefighter.rank }}</td>
-                                    <td>{{ firefighter.experience_level }}</td>
-                                    <td>{{ firefighter.station }}</td>
-                                    <td class="text-center">
-                                        <a href="{% url 'update_firefighter' firefighter.id %}" class="btn btn-warning btn-sm" title="Edit Firefighter">
-                                            <i class="la la-edit"></i> Edit
-                                        </a>
-                                        <a href="{% url 'delete_firefighter' firefighter.id %}" class="btn btn-danger btn-sm" title="Delete Firefighter">
-                                            <i class="la la-trash"></i> Delete
-                                        </a>
-                                    </td>
-                                </tr>
-                                {% empty %}
-                                <tr>
-                                    <td colspan="5" class="text-center">
-                                        <p class="text-muted mb-0">No firefighters found. Please add a new firefighter.</p>
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Pagination -->
-                    <div class="d-flex justify-content-center mt-3">
-                        {% include 'includes/pagination.html' %}
-                    </div>
-                </div>
-            </div>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header">
+          <div class="d-flex align-items-center">
+            <h4 class="card-title">Firefighter List</h4>
+            <a href="{% url 'create_firefighter' %}" class="btn btn-primary btn-round ml-auto">
+              <i class="fa fa-plus"></i>
+              Add Firefighter
+            </a>
+          </div>
         </div>
+        <div class="card-body">
+          <!-- Search and Add Buttons -->
+          <div class="row mb-3">
+            <div class="col-lg-6 col-md-6 col-sm-12">
+              <form class="navbar-form" action="{% url 'firefighter-list' %}" method="get">
+                <div class="input-group">
+                  <input 
+                    type="text" 
+                    placeholder="Search ..." 
+                    class="form-control" 
+                    name="q" 
+                    value="{{ request.GET.q|default:'' }}" />
+                  <div class="input-group-append">
+                    <span class="input-group-text">
+                      <i class="la la-search search-icon"></i>
+                    </span>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <!-- Firefighter Table -->
+          <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Rank</th>
+                  <th>Experience Level</th>
+                  <th>Station</th>
+                  <th class="text-center">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for firefighter in firefighters %}
+                <tr>
+                  <td>{{ firefighter.name }}</td>
+                  <td>{{ firefighter.rank }}</td>
+                  <td>{{ firefighter.experience_level }}</td>
+                  <td>{{ firefighter.station }}</td>
+                  <td class="text-center">
+                    <div class="d-flex justify-content-center">
+                      <a href="{% url 'update_firefighter' firefighter.id %}" class="btn btn-warning btn-sm mr-2" title="Edit Firefighter">
+                        <i class="fa fa-edit"></i> Edit
+                      </a>
+                      <a href="#" class="btn btn-danger btn-sm" title="Delete Firefighter" onclick="confirmDelete('{% url 'delete_firefighter' firefighter.id %}')">
+                        <i class="fa fa-trash"></i> Delete
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="5" class="text-center">
+                    <p class="text-muted mb-0">No firefighters found. Please add a new firefighter.</p>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination -->
+          <div class="d-flex justify-content-center mt-3">
+            {% include 'includes/pagination.html' %}
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
 </div>
 
 <!-- Notifications and Delete Confirmation Script -->
