@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="page-inner">
+  <div class="page-header">
+    <h4 class="page-title">Update Firefighter</h4>
+    <ul class="breadcrumbs">
+      <li class="nav-home">
+        <a href="{% url 'home' %}">
+          <i class="flaticon-home"></i>
+        </a>
+      </li>
+      <li class="separator">
+        <i class="flaticon-right-arrow"></i>
+      </li>
+      <li class="nav-item">
+        <a href="{% url 'firefighter-list' %}">Firefighters</a>
+      </li>
+      <li class="separator">
+        <i class="flaticon-right-arrow"></i>
+      </li>
+      <li class="nav-item">
+        <a href="#">Edit</a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header">
+          <h4 class="card-title">Firefighter Details</h4>
+        </div>
+        <div class="card-body">
+          <form method="post">
+            {% csrf_token %}
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  {{ form.as_p }}
+                  {% if form.errors %}
+                    <div class="alert alert-danger">
+                      <ul>
+                        {% for field in form %}
+                          {% for error in field.errors %}
+                            <li>{{ error }}</li>
+                          {% endfor %}
+                        {% endfor %}
+                        {% for error in form.non_field_errors %}
+                          <li>{{ error }}</li>
+                        {% endfor %}
+                      </ul>
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+            <div class="card-action">
+              <button type="submit" class="btn btn-primary">Save</button>
+              <a href="{% url 'firefighter-list' %}" class="btn btn-danger">Cancel</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

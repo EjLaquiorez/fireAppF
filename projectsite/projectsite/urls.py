@@ -18,12 +18,12 @@ from fire.views import (
     LocationListView,
     LocationCreateView,
     LocationUpdateView,
-    LocationDeleteView
+    LocationDeleteView,
+    FirefighterListView, FirefighterCreateView, FirefighterUpdateView, FirefighterDeleteView,
+    map_station
 )
 
 from fire import views
-    
-
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -51,4 +51,9 @@ urlpatterns = [
     path('locations/add/', LocationCreateView.as_view(), name='location-create'),
     path('locations/<int:pk>/edit/', LocationUpdateView.as_view(), name='location-update'),
     path('locations/<int:pk>/delete/', LocationDeleteView.as_view(), name='location-delete'),
+    path('firefighters/', FirefighterListView.as_view(), name='firefighter-list'),
+    path('firefighters/create/', FirefighterCreateView.as_view(), name='create_firefighter'),
+    path('firefighters/update/<int:pk>/', FirefighterUpdateView.as_view(), name='update_firefighter'),
+    path('firefighters/delete/<int:pk>/', FirefighterDeleteView.as_view(), name='delete_firefighter'),
+    path('firefighters/map/', map_station, name='map_station'),  
 ]

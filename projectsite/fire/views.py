@@ -9,8 +9,8 @@ from django.db.models import Count, Avg, Q
 from datetime import datetime
 from django.contrib import messages
 
-from .models import Locations, Incident, FireStation
-from .forms import IncidentForm, LocationForm
+from .models import Locations, Incident, FireStation, Firefighters
+from .forms import IncidentForm, LocationForm, FirefighterForm
 
 import requests
 from django.conf import settings
@@ -173,24 +173,10 @@ def multipleBarbySeverity(request):
     return JsonResponse(result)
 
 def map_station(request):
-    # Retrieve fire station data from the database
-    fireStations = FireStation.objects.values('name', 'latitude', 'longitude')
-
-    # Convert latitude and longitude to float for proper handling in JavaScript
-    for fs in fireStations:
-        fs['latitude'] = float(fs['latitude'])
-        fs['longitude'] = float(fs['longitude'])
-
-    # Convert QuerySet to a list
-    fireStations_list = list(fireStations)
-
-    # Prepare context to pass to the template
-    context = {
-        'fireStations': fireStations_list,
-    }
-
-    # Render the template with the fire station data
-    return render(request, 'map_station.html', context)
+    fire_stations = FireStation.objects.all().values('name', 'latitude', 'longitude')
+    # Filter out fire stations with None latitude or longitude
+    fire_stations = [fs for fs in fire_stations if fs['latitude'] is not None and fs['longitude'] is not None]
+    return render(request, 'map_station.html', {'fireStations': fire_stations})
 
 def chart_data(request):
     # Group incidents by severity_level and count them
@@ -441,3 +427,38 @@ class LocationDeleteView(DeleteView):
     model = Locations
     template_name = 'location_confirm_delete.html'
     success_url = reverse_lazy('location-list')
+
+class FirefighterListView(ListView):
+    model = Firefighters
+    template_name = 'firefighter_list.html'
+    context_object_name = 'firefighters'
+
+class FirefighterCreateView(CreateView):
+    model = Firefighters
+    form_class = FirefighterForm
+    template_name = 'firefighter_create.html'  # Ensure this matches the actual template file name
+    success_url = reverse_lazy('firefighter-list')
+
+    def form_valid(self, form):
+        messages.success(self.request, 'Firefighter created successfully!')
+        return super().form_valid(form)
+
+class FirefighterUpdateView(UpdateView):
+    model = Firefighters
+    form_class = FirefighterForm
+    template_name = 'firefighter_update.html'
+    success_url = reverse_lazy('firefighter-list')
+
+    def form_valid(self, form):
+        messages.success(self.request, 'Firefighter updated successfully!')
+        return super().form_valid(form)
+
+class FirefighterDeleteView(DeleteView):
+    model = Firefighters
+    template_name = 'firefighter_delete.html'
+    success_url = reverse_lazy('firefighter-list')
+
+    def delete(self, request, *args, **kwargs):
+        response = super().delete(request, *args, **kwargs)
+        messages.success(request, 'Firefighter deleted successfully!')
+        return response

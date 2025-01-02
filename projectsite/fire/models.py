@@ -104,49 +104,69 @@ class Incident(BaseModel):
     )
 
 
-class FireStation(BaseModel):
+class FireStation(models.Model):
     name = models.CharField(max_length=150)
-    latitude = models.DecimalField(
-        max_digits=22, decimal_places=16, null=True, blank=True)
-    longitude = models.DecimalField(
-        max_digits=22, decimal_places=16, null=True, blank=True)
     address = models.CharField(max_length=150)
-    city = models.CharField(max_length=150)  # can be in separate table
-    country = models.CharField(max_length=150)  # can be in separate table
+    city = models.CharField(max_length=150)
+    country = models.CharField(max_length=150)
+    latitude = models.DecimalField(max_digits=22, decimal_places=16, null=True, blank=True)
+    longitude = models.DecimalField(max_digits=22, decimal_places=16, null=True, blank=True)
+
+    def __str__(self):
+        return self.name
 
 
-class Firefighters(BaseModel):
-    XP_CHOICES = (
-        ('Probationary Firefighter', 'Probationary Firefighter'),
-        ('Firefighter I', 'Firefighter I'),
-        ('Firefighter II', 'Firefighter II'),
-        ('Firefighter III', 'Firefighter III'),
-        ('Driver', 'Driver'),
-        ('Captain', 'Captain'),
-        ('Battalion Chief', 'Battalion Chief'),)
+class Firefighters(models.Model):
+    RANK_CHOICES = (
+        ('Director', 'Director'),
+        ('Chief Superintendent', 'Chief Superintendent'),
+        ('Senior Superintendent', 'Senior Superintendent'),
+        ('Superintendent', 'Superintendent'),
+        ('Chief Inspector', 'Chief Inspector'),
+        ('Senior Inspector', 'Senior Inspector'),
+        ('Inspector', 'Inspector'),
+    )
     name = models.CharField(max_length=150)
-    rank = models.CharField(max_length=150)
+    rank = models.CharField(
+        max_length=45,  # Reduced from 150 since we have choices
+        choices=RANK_CHOICES,
+        help_text="Firefighter's rank"
+    )
     experience_level = models.CharField(
         max_length=45,  # Reduced from 150 since we have choices
-        choices=XP_CHOICES,
+        choices=(
+            ('Probationary Firefighter', 'Probationary Firefighter'),
+            ('Firefighter I', 'Firefighter I'),
+            ('Firefighter II', 'Firefighter II'),
+            ('Firefighter III', 'Firefighter III'),
+            ('Driver', 'Driver'),
+            ('Captain', 'Captain'),
+            ('Battalion Chief', 'Battalion Chief'),
+        ),
         help_text="Firefighter's experience level"
     )
-    station = models.ForeignKey(  # Changed to ForeignKey
-        FireStation,
-        on_delete=models.SET_NULL,
-        null=True,
-        related_name='firefighters'
+    station = models.CharField(
+        max_length=150,
+        choices=[
+            ('Station 1', 'Station 1'),
+            ('Station 2', 'Station 2'),
+            ('Station 3', 'Station 3'),
+            ('Station 4', 'Station 4'),
+            ('Station 5', 'Station 5'),
+        ],
+        help_text="Fire station where the firefighter is assigned",
+        default='Station 1'  # Provide a default value here
     )
 
 
-class FireTruck(BaseModel):
+class FireTruck(models.Model):
     truck_number = models.CharField(max_length=150)
     model = models.CharField(max_length=150)
     capacity = models.CharField(max_length=150)  # water
     station = models.ForeignKey(FireStation, on_delete=models.CASCADE)
 
 
-class WeatherConditions(BaseModel):
+class WeatherConditions(models.Model):
     incident = models.ForeignKey(Incident, on_delete=models.CASCADE)
     temperature = models.DecimalField(max_digits=10, decimal_places=2)
     humidity = models.DecimalField(max_digits=10, decimal_places=2)

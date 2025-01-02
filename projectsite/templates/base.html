@@ -38,16 +38,9 @@
         <!-- Logo Header -->
         <div class="logo-header" data-background-color="blue">
           <a href="{% url 'home' %}" class="logo">
-            <img src="{% static 'img/logo.svg' %}" alt="navbar brand" class="navbar-brand" />
+            <img src="{% static 'img/logo.svg' %}" alt="navbar brand" class="navbar-brand">
           </a>
-          <button
-            class="navbar-toggler sidenav-toggler ml-auto"
-            type="button"
-            data-toggle="collapse"
-            data-target="collapse"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-          >
+          <button class="navbar-toggler sidenav-toggler ml-auto" type="button" data-toggle="collapse" data-target="collapse" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon">
               <i class="icon-menu"></i>
             </span>
@@ -64,8 +57,145 @@
         <!-- Navbar Header -->
         <nav class="navbar navbar-header navbar-expand-lg" data-background-color="blue2">
           <div class="container-fluid">
-            <div class="collapse" id="search-nav"></div>
-            <ul class="navbar-nav topbar-nav ml-md-auto align-items-center"></ul>
+            <ul class="navbar-nav topbar-nav ml-md-auto align-items-center">
+              <li class="nav-item dropdown hidden-caret">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <i class="fa fa-bell"></i>
+                  <span class="notification">4</span>
+                </a>
+                <ul class="dropdown-menu notif-box" aria-labelledby="navbarDropdown">
+                  <li>
+                    <div class="dropdown-title">You have 4 new notifications</div>
+                  </li>
+                  <li>
+                    <div class="notif-center">
+                      <a href="#">
+                        <div class="notif-icon notif-primary"> <i class="fa fa-user-plus"></i> </div>
+                        <div class="notif-content">
+                          <span class="block">New user registered</span>
+                          <span class="time">5 minutes ago</span>
+                        </div>
+                      </a>
+                      <a href="#">
+                        <div class="notif-icon notif-success"> <i class="fa fa-comment"></i> </div>
+                        <div class="notif-content">
+                          <span class="block">Rahmad commented on Admin</span>
+                          <span class="time">12 minutes ago</span>
+                        </div>
+                      </a>
+                      <a href="#">
+                        <div class="notif-icon notif-danger"> <i class="fa fa-heart"></i> </div>
+                        <div class="notif-content">
+                          <span class="block">Farrah liked Admin</span>
+                          <span class="time">17 minutes ago</span>
+                        </div>
+                      </a>
+                      <a href="#">
+                        <div class="notif-icon notif-warning"> <i class="fa fa-check"></i> </div>
+                        <div class="notif-content">
+                          <span class="block">Server restarted</span>
+                          <span class="time">19 minutes ago</span>
+                        </div>
+                      </a>
+                    </div>
+                  </li>
+                  <li>
+                    <a class="see-all" href="javascript:void(0);">See all notifications<i class="fa fa-angle-right"></i> </a>
+                  </li>
+                </ul>
+              </li>
+              <li class="nav-item dropdown hidden-caret">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <i class="fa fa-envelope"></i>
+                  <span class="notification">3</span>
+                </a>
+                <ul class="dropdown-menu notif-box" aria-labelledby="navbarDropdown">
+                  <li>
+                    <div class="dropdown-title">You have 3 new messages</div>
+                  </li>
+                  <li>
+                    <div class="notif-center">
+                      <a href="#">
+                        <div class="notif-icon notif-primary"> <i class="fa fa-user-plus"></i> </div>
+                        <div class="notif-content">
+                          <span class="block">New user registered</span>
+                          <span class="time">5 minutes ago</span>
+                        </div>
+                      </a>
+                      <a href="#">
+                        <div class="notif-icon notif-success"> < i class="fa fa-comment"></i> </div>
+                        <div class="notif-content">
+                          <span class="block">Rahmad commented on Admin</span>
+                          <span class="time">12 minutes ago</span>
+                        </div>
+                      </a>
+                      <a href="#">
+                        <div class="notif-icon notif-danger"> < i class="fa fa-heart"></i> </div>
+                        <div class="notif-content">
+                          <span class="block">Farrah liked Admin</span>
+                          <span class="time">17 minutes ago</span>
+                        </div>
+                      </a>
+                      <a href="#">
+                        <div class="notif-icon notif-warning"> <i class="fa fa-check"></i> </div>
+                        <div class="notif-content">
+                          <span class="block">Server restarted</span>
+                          <span class="time">19 minutes ago</span>
+                        </div>
+                      </a>
+                    </div>
+                  </li>
+                  <li>
+                    <a class="see-all" href="javascript:void(0);">See all messages<i class="fa fa-angle-right"></i> </a>
+                  </li>
+                </ul>
+              </li>
+              <li class="nav-item dropdown hidden-caret">
+                <a class="nav-link" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <i class="fa fa-user"></i>
+                </a>
+                <ul class="dropdown-menu notif-box" aria-labelledby="navbarDropdown">
+                  <li>
+                    <div class="dropdown-title">Profile</div>
+                  </li>
+                  <li>
+                    <div class="notif-center">
+                      <a href="#">
+                        <div class="notif-icon notif-primary"> <i class="fa fa-user-plus"></i> </div>
+                        <div class="notif-content">
+                          <span class="block">New user registered</span>
+                          <span class="time">5 minutes ago</span>
+                        </div>
+                      </a>
+                      <a href="#">
+                        <div class="notif-icon notif-success"> <i class="fa fa-comment"></i> </div>
+                        <div class="notif-content">
+                          <span class="block">Rahmad commented on Admin</span>
+                          <span class="time">12 minutes ago</span>
+                        </div>
+                      </a>
+                      <a href="#">
+                        <div class="notif-icon notif-danger"> < i class="fa fa-heart"></i> </div>
+                        <div class="notif-content">
+                          <span class="block">Farrah liked Admin</span>
+                          <span class="time">17 minutes ago</span>
+                        </div>
+                      </a>
+                      <a href="#">
+                        <div class="notif-icon notif-warning"> < i class="fa fa-check"></i> </div>
+                        <div class="notif-content">
+                          <span class="block">Server restarted</span>
+                          <span class="time">19 minutes ago</span>
+                        </div>
+                      </a>
+                    </div>
+                  </li>
+                  <li>
+                    <a class="see-all" href="javascript:void(0);">See all messages<i class="fa fa-angle-right"></i> </a>
+                  </li>
+                </ul>
+              </li>
+            </ul>
           </div>
         </nav>
         <!-- End Navbar -->
@@ -75,40 +205,11 @@
       <div class="sidebar sidebar-style-2">
         <div class="sidebar-wrapper scrollbar scrollbar-inner">
           <div class="sidebar-content">
-            <div class="user">
-              <div class="avatar-sm float-left mr-2">
-                <img src="{% static 'img/profile.jpg' %}" alt="..." class="avatar-img rounded-circle" />
-              </div>
-              <div class="info">
-                <a data-toggle="collapse" href="#collapseExample" aria-expanded="true">
-                  <span>
-                    Earl
-                    <span class="user-level">Administrator</span>
-                    <span class="caret"></span>
-                  </span>
-                </a>
-                <div class="clearfix"></div>
-
-                <div class="collapse in" id="collapseExample">
-                  <ul class="nav">
-                    <li>
-                      <a href="#profile"><span class="link-collapse">My Profile</span></a>
-                    </li>
-                    <li>
-                      <a href="#edit"><span class="link-collapse">Edit Profile</span></a>
-                    </li>
-                    <li>
-                      <a href="#settings"><span class="link-collapse">Settings</span></a>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
             <ul class="nav nav-primary">
               <li class="nav-item">
                 <a href="{% url 'home' %}">
                   <i class="fas fa-home"></i>
-                  <p>Home</p>
+                  <p>Dashboard</p>
                 </a>
               </li>
               <li class="nav-section">
@@ -116,43 +217,6 @@
                   <i class="fa fa-ellipsis-h"></i>
                 </span>
                 <h4 class="text-section">Components</h4>
-              </li>
-              <li class="nav-item">
-                <a data-toggle="collapse" href="#maps">
-                  <i class="fas fa-map-marker-alt"></i>
-                  <p>Maps</p>
-                  <span class="caret"></span>
-                </a>
-                <div class="collapse" id="maps">
-                  <ul class="nav nav-collapse">
-                    <li>
-                      <a href="{% url 'map-station' %}">
-                        <span class="sub-item">Fire Stations</span>
-                      </a>
-                    </li>
-                    <li>
-                      <a href="{% url 'map-incident' %}">
-                        <span class="sub-item">Fire Incidents</span>
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-              </li>
-              <li class="nav-item">
-                <a data-toggle="collapse" href="#charts">
-                  <i class="far fa-chart-bar"></i>
-                  <p>Charts</p>
-                  <span class="caret"></span>
-                </a>
-                <div class="collapse" id="charts">
-                  <ul class="nav nav-collapse">
-                    <li>
-                      <a href="{% url 'dashboard-chart' %}">
-                        <span class="sub-item">Dashboard</span>
-                      </a>
-                    </li>
-                  </ul>
-                </div>
               </li>
               <li class="nav-item">
                 <a data-toggle="collapse" href="#incidents">
@@ -164,17 +228,50 @@
                   <ul class="nav nav-collapse">
                     <li>
                       <a href="{% url 'incident-list' %}">
-                        <span class="sub-item">View Incidents</span>
-                      </a>
-                    </li>
-                    <li>
-                      <a href="{% url 'incident-create' %}">
-                        <span class="sub-item">Add Incident</span>
+                        <span class="sub-item">List of Incidents</span>
                       </a>
                     </li>
                   </ul>
                 </div>
               </li>
+              <li class="nav-item">
+                <a data-toggle="collapse" href="#firefighters">
+                  <i class="fas fa-users"></i>
+                  <p>Firefighters</p>
+                  <span class="caret"></span>
+                </a>
+                <div class="collapse" id="firefighters">
+                  <ul class="nav nav-collapse">
+                    <li>
+                      <a href="{% url 'firefighter-list' %}">
+                        <span class="sub-item">List of Firefighters</span>
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </li>
+              <li class="nav-item">
+                <a data-toggle="collapse" href="#firestations">
+                  <i class="fas fa-building"></i>
+                  <p>FireStations</p>
+                  <span class="caret"></span>
+                </a>
+                <div class="collapse" id="firestations">
+                  <ul class="nav nav-collapse">
+                    <li>
+                      <a href="{% url 'location-list' %}">
+                        <span class="sub-item">List of FireStations</span>
+                      </a>
+                    </li>
+                    <li>
+                      <a href="{% url 'map_station' %}">
+                        <span class="sub-item">Maps</span>
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </li>
+              <!-- Add more navigation items here -->
             </ul>
           </div>
         </div>
@@ -255,8 +352,18 @@
       });
     </script>
     {% endblock %}
+
+    {% block map %}
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // Your map initialization code here
+        const map = new GMaps({
+          el: '#yourMapId',
+          lat: -12.043333,
+          lng: -77.028333
+        });
+      });
+    </script>
+    {% endblock %}
   </body>
 </html>
-
-</```
-rewritten_file>
